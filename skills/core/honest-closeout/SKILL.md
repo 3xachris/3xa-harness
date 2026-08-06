@@ -1,6 +1,6 @@
 ---
 name: honest-closeout
-description: Close a task with a report a reviewer can trust — every acceptance line answered with evidence, human corrections credited to whoever made them, refuted hypotheses kept, background processes proven stopped, and the chat message copied verbatim from the report. Use when reporting work as finished, writing a completion report, summarising what a session achieved, or handing a result to whoever reviews it.
+description: Close a task with a report a reviewer can trust — every acceptance line answered with evidence or a recorded blocking reason, human corrections credited to whoever made them, refuted hypotheses kept, background processes proven stopped, and the chat message copied verbatim from the report. Use when reporting work as finished, writing a completion report, summarising what a session achieved, or handing a result to whoever reviews it.
 ---
 
 # Honest Closeout
@@ -19,10 +19,11 @@ This is where the pack's reporting conventions are defined; other skills point h
   |---|---|
   | `WORKING` | running; nothing needed from you |
   | `GATE-HOLD` | stopped at a review gate, waiting on your judgment |
-  | `STOPPED` | stopped short — a budget fuse, a two-strike failure, a conflict to resolve |
-  | `DONE` | finished and closed out |
+  | `STOPPED` | stopped short — the two-strike rule handed the next move back to you |
+  | `DONE` | every acceptance line passed with evidence |
+  | `CLOSED-FAILED` | every acceptance line has evidence or a recorded blocking reason, but the target was not achieved |
 
-  Choose from the four. A state that fits none of them is `STOPPED`, with the reason on the next line.
+  Choose from these five. Use `DONE` when every acceptance line passed, `CLOSED-FAILED` when the trail is complete but the target was not achieved, and `STOPPED` when the two-strike rule ends the run. A state that fits none of them is `STOPPED`, with the reason on the next line.
 - **The wait token.** A message that needs the human to act ends with one fixed token alone on the final line — `WAITING_FOR_HUMAN`. It is reserved for exactly that case, which is what keeps it meaning something when it appears.
 - **Codes for state, sentences for claims.** The status word and the wait token compress *state* — what this task is doing right now — and compression suits state, because it has a fixed set of values and gets read on every message. A **claim about the world** is the opposite case: this dependency is unmaintained, that bug is fixed, the upstream project has a design flaw. Claims go in full sentences in the report body, however long the sentence needs to be. Compressed into a field — `severity: high`, `A1: read-side absent` — a claim loses the one property a reviewer reads it for: how much it is asserting. A reader can tell that *"the upstream project has a structural hole"* deserves a second look before anyone acts on it; nobody can tell that from a severity value. The audacity of a claim lives in its wording, and the wording is exactly what a code throws away.
 - **`[UNVERIFIED]` marks the unchecked.** Version numbers, licence terms, quota limits, "this is fixed" — anything not confirmed at its source this session carries the tag inline, so a reviewer can tell a checked statement from a confident one.
@@ -45,7 +46,7 @@ The report is a file on disk. The chat message is a copy of part of it, never a 
 
 Read the report as the reviewer: **for every acceptance line, can you point at the evidence without asking a question?**
 
-Then five checks with a yes-or-no answer each:
+Then six checks with a yes-or-no answer each:
 
 - every background process this session started is named, with how it ended
 - every gate folder this task opened has an empty `rejects/`
@@ -59,19 +60,19 @@ The two things that stay a judgment — that human contributions are credited to
 ## Report template
 
 ```markdown
-# Closeout: <task name> — <PASSED / FAILED (closed) / STOPPED at budget>
+# Closeout: <task name> — <DONE / CLOSED-FAILED / STOPPED>
 
 **Order:** <path to the frozen order this was measured against>
 
 ## Chat summary (send this section verbatim)
 
-DONE
+<DONE | CLOSED-FAILED | STOPPED>
 - <what got built / where it died / the numbers that matter>
 - <paths a human needs to open>
 
 <!-- WAITING_FOR_HUMAN belongs here only when this closeout needs a decision
-     from the human — a FAILED or STOPPED result, or an open question. A DONE
-     that needs nothing back ends without it. -->
+     from the human — a CLOSED-FAILED or STOPPED result, or an open question.
+     A DONE that needs nothing back ends without it. -->
 
 ## Acceptance
 

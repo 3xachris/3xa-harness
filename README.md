@@ -47,7 +47,7 @@ npx skills@latest add 3xachris/3xa-harness
 
 | Skill | One-line usage |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to done in one pass instead of returning at every bump. |
+| [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass instead of returning at every bump. |
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with a `rejects/` subfolder; the agent holds there, and you reject by dragging a file into `rejects/`. Nothing to write. |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | One append-only log, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session, so the next agent opens the log without being told. |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |

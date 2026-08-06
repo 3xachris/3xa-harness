@@ -27,16 +27,16 @@ Seven fields, plus the header line that freezes it.
 
 ## 2. Run the order
 
-1. **Check the order against the disk first**, and open the project's decision log while you are there — it holds what was settled before this order existed. Paths, filenames, service states, versions: confirm each assumption the order rests on before the first edit. Messages from here on open with `WORKING`. Where disk and order disagree, the disk wins: stop, name the conflict, and ask.
+1. **Check the order against the disk first**, and open the project's decision log while you are there — it holds what was settled before this order existed. Paths, filenames, service states, versions: confirm each assumption the order rests on before the first edit. Messages from here on open with `WORKING`. Treat the disk as the factual authority: when it disagrees with the order, stop, name the conflict, and ask before deciding how to proceed.
 2. **Build the whole scope**, keeping the budget count in the artifacts folder as you spend it — one line per unit spent, written when it is spent. Every acceptance line is a deliverable; a line that turns out to be blocked is reported as blocked, with the rest finished in full.
 3. **Self-verify**, walking the acceptance list line by line and attaching the evidence each line named.
 4. **Self-fix and re-verify.** Stay in this loop until every line carries evidence. When a failure resists a first look, `staged-diagnosis` (the `harness-debug` add-on) is the ordered way through it.
-5. **The two-strike rule**, defined here and referred to from elsewhere: a *sub-problem* is one acceptance line failing for one identified cause, and it takes a **strike** each time an attempt aimed at that cause leaves it still failing. At two strikes the loop ends with a `STOPPED` message — carry the full trail, including which hypotheses were refuted, back to the human, who decides the next move. A sub-problem that got fixed is closed and its strikes are gone; a new cause behind the same line starts at zero.
+5. **The two-strike rule**, defined here and referred to from elsewhere: a *sub-problem* is one acceptance line failing for one identified cause, and it takes a **strike** each time an attempt aimed at that cause leaves it still failing. At two strikes the loop ends with a `STOPPED` message — carry the full trail, including which hypotheses were refuted, back to the human, who decides the next move. A sub-problem that got fixed is closed and its strikes are gone; a new cause behind the same line starts at zero only after you state its distinct, checkable prediction: what it predicts that the previous cause cannot, or what observation the previous cause cannot explain.
 6. **Close out** with `honest-closeout`, whether the result passed or failed.
 
 ## 3. Completion criteria
 
-The order is done when **every acceptance line has evidence attached to it**, line by line. Read the frozen order one more time beside the closeout and answer, line by line: is this line evidenced, blocked-and-reported, or neither? Only the third answer means there is still work to do.
+The order is ready for closeout when every acceptance line is classified line by line as passed with evidence, failed with evidence, or blocked with a recorded reason. Use the `honest-closeout` status definitions: `DONE` when every line passed, `CLOSED-FAILED` when the trail is complete but the target was not achieved, and `STOPPED` when the two-strike rule ended the run. Read the frozen order beside the closeout and confirm that every line has one of those classifications.
 
 The order itself is ready to freeze when all seven fields are filled and the header carries `[FROZEN <date> by <owner>]`; until that line exists, there is nothing to build against.
 
