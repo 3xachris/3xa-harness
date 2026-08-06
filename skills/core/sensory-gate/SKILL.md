@@ -29,7 +29,7 @@ The status words this message uses — `GATE-HOLD` to open the gate, `WAITING_FO
 ## 2. Run the gate
 
 1. Produce the **whole batch** for this round before asking — one round of attention, spent once.
-2. Create the gate folder with `NG/` already inside it.
+2. Create the gate folder with `NG/` already inside it, inside this task's artifacts folder — that is what makes "every gate folder this task opened" something the closeout can list rather than remember.
 3. Send one message: `GATE-HOLD`, the runnable open command and the plain path, the plain-language question, and the wait token on its own last line.
 4. **Hold.** The next thing this task does is read the human's answer. One request, sent once, is the whole ask.
 5. When they answer, read the gate folder from disk. Files inside `NG/` are rejected, full stop — that action was the verdict and it needs no confirming question. Rejects named in words get moved into `NG/` by you, so the folder and the verdict agree.
@@ -38,7 +38,7 @@ The status words this message uses — `GATE-HOLD` to open the gate, `WAITING_FO
 
 ## 3. Completion criteria
 
-Before sending, **open the gate folder yourself** — the folder, not your memory of writing to it — and check four things: the path in the message resolves; `NG/` exists and is empty; the file count in the folder equals the count the message claims; and the question contains no word that only someone who built the pipeline would know.
+Before sending, **open the gate folder yourself** — the folder, not your memory of writing to it — and check four things: the path in the message resolves; `NG/` exists and is empty; the file count in the folder equals the count the message claims; and every noun in the question names something visible in the artifact itself or present in the original request.
 
 ## Gate message
 

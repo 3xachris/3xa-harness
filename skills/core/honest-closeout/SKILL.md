@@ -30,14 +30,15 @@ This is where the pack's reporting conventions are defined; other skills point h
 
 The report is a file on disk. The chat message is a copy of part of it, never a separate composition.
 
-1. **Answer the acceptance list line by line.** Each line gets PASS or FAIL and the evidence it named — path, output, measurement. A line nobody can evidence is FAIL with the reason, which is information; a line summarised instead of answered is a gap.
-2. **Record what people did**, compiled from the log entries written at the time rather than from what the session remembers. Every human stop, correction, or diagnosis appears with the person who supplied it, including permissions granted mid-build (a dependency installed, a setting changed) — the reviewer is deciding about a system whose state changed, and needs to know it did. Where a `decision-log` is running, its `correction` entries are the source this section is built from.
-3. **Keep the refuted hypotheses.** What was tried and eliminated is the most reusable part of the report; the next attempt spends its budget on new ground instead of re-walking this one.
-4. **Report the budget spent** against the fuse the order set — the count, the unit, and whether the fuse was reached. A build that stopped on its fuse and a build that finished are different results, and only this line tells them apart.
-5. **Prove the background is clear.** Query the tooling for every background process this session started and account for each one. Anything meant to outlive the report is declared with a receipt a later session can check by itself: an absolute output path, a PID, or a log file's absolute path. A name only this session knows is not a receipt.
-6. **Write the chat-summary section inside the report** — status word, the three-to-five line result, the paths a human needs to open, the wait token if action is needed.
-7. **Send that section verbatim.** Copy it out of the file; a summary rewritten from memory late in a long session drifts, and drift runs toward the flattering version.
-8. **Leave the log a pointer.** One `closeout` entry — the result in a line, the report's path as its Target — so the next session finds this report by reading the log rather than by knowing it exists. Run the `decision-log` skill for the entry format.
+1. **Answer the acceptance list line by line**, reading it as amended — where the order carries amendment blocks, the amended text is the one being answered. Each line gets PASS or FAIL and the evidence it named — path, output, measurement. A line nobody can evidence is FAIL with the reason, which is information; a line summarised instead of answered is a gap.
+2. **Answer the frozen order's other two claims**: that the work used only the materials the order allowed, and that it stayed out of the non-goals. Both are one line each, and both are the fields a reviewer would otherwise have to reconstruct from the diff.
+3. **Record what people did**, compiled from the log entries written at the time rather than from what the session remembers. Every human stop, correction, or diagnosis appears with the person who supplied it, including permissions granted mid-build (a dependency installed, a setting changed) — the reviewer is deciding about a system whose state changed, and needs to know it did. Where a `decision-log` is running, its `correction` entries are the source this section is built from.
+4. **Keep the refuted hypotheses.** What was tried and eliminated is the most reusable part of the report; the next attempt spends its budget on new ground instead of re-walking this one.
+5. **Report the budget spent** against the fuse the order set — the count, the unit, and whether the fuse was reached. A build that stopped on its fuse and a build that finished are different results, and only this line tells them apart.
+6. **Prove the background is clear.** Query the tooling for every background process this session started and account for each one. Anything meant to outlive the report is declared with a receipt a later session can check by itself: an absolute output path, a PID, or a log file's absolute path. A name only this session knows is not a receipt.
+7. **Write the chat-summary section inside the report** — status word, the three-to-five line result, the paths a human needs to open, the wait token if action is needed.
+8. **Send that section verbatim.** Copy it out of the file; a summary rewritten from memory late in a long session drifts, and drift runs toward the flattering version.
+9. **Leave the log a pointer.** One `closeout` entry — the result in a line, the report's path as its Target — so the next session finds this report by reading the log rather than by knowing it exists. Run the `decision-log` skill for the entry format.
 
 ## 3. Completion criteria
 
@@ -58,12 +59,17 @@ The two things that stay a judgment — that human contributions are credited to
 ```markdown
 # Closeout: <task name> — <PASSED / FAILED (closed) / STOPPED at budget>
 
+**Order:** <path to the frozen order this was measured against>
+
 ## Chat summary (send this section verbatim)
 
 DONE
 - <what got built / where it died / the numbers that matter>
 - <paths a human needs to open>
-WAITING_FOR_HUMAN
+
+<!-- WAITING_FOR_HUMAN belongs here only when this closeout needs a decision
+     from the human — a FAILED or STOPPED result, or an open question. A DONE
+     that needs nothing back ends without it. -->
 
 ## Acceptance
 

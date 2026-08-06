@@ -11,7 +11,7 @@ A fresh session inherits what was written down and nothing else. The log carries
 
 - **One file, append-only.** The log is a timeline: past entries stay as written, and a change of mind arrives as a new entry that references the old one. Reading it top to bottom shows how the thinking moved, which is usually the question being asked.
 - **Every entry opens with an index line**, directly under its heading, in a fixed format:
-  `> Type: <decision|amendment|rejection|correction|closeout> | Target: <path to where the detail lives, or "none (process note)">`
+  `> Type: <decision|amendment|rejection|correction|closeout> | Target: <path from the project root to where the detail lives, or the bare word `none`>`
   Five types, each with something that writes it: a choice made (`decision`), a frozen scope changed (`amendment`, from `workorder`), a human turning an artifact down (`rejection`, from `sensory-gate`), a human correcting the work (`correction`), a task finished and reported (`closeout`, from `honest-closeout`). A type nothing produces is a type the format check spends its strictness guarding for no one.
   This line is what makes an entry findable by machine and skimmable by human. Write it at the time — it is the one part of an entry that cannot be reconstructed afterwards.
 - **Entries point.** Roughly five lines: what was decided, the one-line reason, and where the full detail lives. When an entry starts growing, the content belongs in a real document and the entry belongs pointing at it.
@@ -35,8 +35,9 @@ Install that line the first time this project gets a log, and the read side runs
 
 1. **Write the entry as the decision happens.** Recall at the end of a long session smooths over the parts that were contested — which are the parts a later reader came for.
 2. **Give the decision a home.** Before writing, ask where the detail belongs: a spec, a config, a design doc, a backlog item. That path goes in the index line's Target field. When no home exists yet, create it in this same turn — a decision whose only home is one log line is a decision the next search will not surface.
-3. **Log the surviving need beside a rejection.** Turning down a proposal leaves the problem it addressed standing. Record that problem as its own findable item — a backlog entry, an open question, a ticket — so it outlives the approach that failed to solve it.
-4. **Check the file size on the way out.** If the live file has crossed 200 KB, split it now, in this session.
+3. **Log a `correction` the moment a human corrects the work** — a stop, a diagnosis you were handed, a call you got wrong and were told so. The entry names what changed and who supplied it, because this is the source the closeout's account of human input is built from, and it cannot be reconstructed later from a session's memory of itself.
+4. **Log the surviving need beside a rejection.** Turning down a proposal leaves the problem it addressed standing. Record that problem as its own findable item — a backlog entry, an open question, a ticket — so it outlives the approach that failed to solve it.
+5. **Check the file size on the way out.** If the live file has crossed 200 KB, split it now, in this session.
 
 ## 4. Completion criteria
 
@@ -52,7 +53,7 @@ The log holds when all four are true, checked over the whole file after appendin
 ```markdown
 ## 2026-08-06 Dropped the write-through cache, kept the staleness problem
 
-> Type: correction | Target: backlog.md#cache-invalidation
+> Type: decision | Target: docs/backlog.md
 
 Write-through cache rejected — complexity the current read volume doesn't
 earn. The staleness it was solving is still real and is now an open item in

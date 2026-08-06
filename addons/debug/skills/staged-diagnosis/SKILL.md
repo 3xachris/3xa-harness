@@ -30,4 +30,4 @@ Judgments of look, sound, taste, or tone are a different question, and a passing
 
 Each stage names its output above; the diagnosis is done when **all six exist and can be shown** — the trigger, the minimal case, the written hypothesis, the measurement, the edit, and the regression evidence. Missing outputs are where a stage was skipped, and a skipped stage is where the next investigation will start.
 
-Two failed attempts at the same cause end the run: hand over the whole trail, refuted hypotheses included, since they are what the next attempt spends its budget on not repeating. (With `harness-core` installed, `workorder` holds the full definition of the two-strike rule.)
+Two failed attempts at the same cause end the run — a cause that got fixed is closed and its attempts are gone; only an unfixed repeat counts: hand over the whole trail, refuted hypotheses included, since they are what the next attempt spends its budget on not repeating. (With `harness-core` installed, `workorder` holds the full definition of the two-strike rule.)
