@@ -1,12 +1,11 @@
 ---
 name: ask-harness
-description: Ask which harness skill fits the situation you're in.
-disable-model-invocation: true
+description: Map the harness skills onto the situation in front of you — which one applies now, where it sits in the loop, and what it hands to the next. Use when someone asks which skill or discipline fits, when starting work on a project that has this pack installed and the entry point isn't obvious, when one skill's output needs to reach another, or when a step of the loop looks like it is being skipped.
 ---
 
 # Ask Harness
 
-You are somewhere in a piece of work and want to know which part of the pack applies. Describe the situation; this is the map to answer from.
+The map from a situation to the skill that answers it. Reach for it when the entry point isn't obvious — either because someone asked, or because work is starting on a project with this pack installed and nothing has said where the loop begins.
 
 Four skills form **one loop** around a single task. Two more sit outside it, reached by situation.
 

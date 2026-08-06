@@ -45,7 +45,7 @@
     {
       "name": "harness-router",
       "source": "./addons/router",
-      "description": "Ask which harness skill fits the situation you're in — a map of the discipline loop and its on-ramps, for humans who'd rather ask than remember.",
+      "description": "A map from the situation at hand to the skill that answers it — the discipline loop, its on-ramps, and where each piece hands off. Model-invoked, so the agent reaches for it when the entry point isn't obvious.",
       "version": "0.2.0",
       "category": "productivity",
       "keywords": [
