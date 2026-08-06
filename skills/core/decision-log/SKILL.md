@@ -5,19 +5,18 @@ description: Keep one append-only log where decisions, rejections, and correctio
 
 # Decision Log
 
-A fresh session inherits what was written down and nothing else. The log is what carries a decision across that boundary — so it is written for the **cold read**: someone who was not there, searching months later, with no memory to fill the gaps.
-
-That reader has one requirement above all others. They must be able to tell, from a scan, which entry holds what they came for.
+A fresh session inherits what was written down and nothing else. The log carries a decision across that boundary, so it is written for the **cold read**: someone who was not there, searching months later, with no memory to fill the gaps. What that reader needs above all is to tell, from a scan, which entry holds what they came for.
 
 ## 1. Shape of the log
 
 - **One file, append-only.** The log is a timeline: past entries stay as written, and a change of mind arrives as a new entry that references the old one. Reading it top to bottom shows how the thinking moved, which is usually the question being asked.
 - **Every entry opens with an index line**, directly under its heading, in a fixed format:
-  `> Type: <decision|amendment|correction|closeout|handoff|info> | Target: <path to where the detail lives, or "none (process note)">`
-  This line is what makes an entry findable by machine and skimmable by human. It is written at the time; a scanner built later to reconstruct it from prose will guess, and will miss entries.
+  `> Type: <decision|amendment|rejection|correction|closeout> | Target: <path to where the detail lives, or "none (process note)">`
+  Five types, each with something that writes it: a choice made (`decision`), a frozen scope changed (`amendment`, from `workorder`), a human turning an artifact down (`rejection`, from `sensory-gate`), a human correcting the work (`correction`), a task finished and reported (`closeout`, from `honest-closeout`). A type nothing produces is a type the format check spends its strictness guarding for no one.
+  This line is what makes an entry findable by machine and skimmable by human. Write it at the time — it is the one part of an entry that cannot be reconstructed afterwards.
 - **Entries point.** Roughly five lines: what was decided, the one-line reason, and where the full detail lives. When an entry starts growing, the content belongs in a real document and the entry belongs pointing at it.
-- **A running summary sits at the top** — open items, current focus, counts — updated in the same edit as the entry below it. It gives the current state in one glance, and it is trustworthy only as long as it is never updated separately from the entries.
-- **Split at 200 KB.** File-reading tools start truncating a live log well before it feels large, and a silently truncated log is worse than a missing one. 200 KB is the number to act on, not to wait for: older entries move to a dated archive, the live file keeps the current period, and both the summary and the archive index are updated in the same pass.
+- **A running summary sits at the top** — open items, current focus, counts — updated in the same edit as the entry below it. It gives the current state in one glance, and stays trustworthy for exactly as long as that pairing holds.
+- **Split at a threshold you set in advance** — 200 KB unless you have a measured reason for another number. The point is having a line at all: file-reading tools truncate a long log silently, and a log you believe you read in full is worse than one you know you didn't. At the line, older entries move to a dated archive, the live file keeps the current period, and both the summary and the archive index are updated in the same pass.
 
 ## 2. Install the pointer, once per project
 
@@ -41,7 +40,12 @@ Install that line the first time this project gets a log, and the read side runs
 
 ## 4. Completion criteria
 
-The log holds when **every `##` heading in it is followed by a line matching `^> Type: (decision|amendment|correction|closeout|handoff|info) \| Target: `, every Target other than `none` resolves to something that exists on disk, and the project's always-loaded file names the log.** All three are checks to run — the first two greppable, the third a look at one file — run over the whole log after appending, not only over the entry just written.
+The log holds when all four are true, checked over the whole file after appending rather than over the entry just written:
+
+- every `##` heading is followed by a line matching `^> Type: (decision|amendment|rejection|correction|closeout) \| Target: ` — greppable
+- every Target other than `none` resolves to something that exists on disk — greppable
+- the running summary's open items match the entries below it — a read of one block against the headings
+- the project's always-loaded file names the log — a look at one file
 
 ## Entry shape
 

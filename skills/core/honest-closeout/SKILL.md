@@ -5,7 +5,7 @@ description: Close a task with a report a reviewer can trust — every acceptanc
 
 # Honest Closeout
 
-A closeout is read by someone deciding whether to trust the work without redoing it. That decision runs on **evidence** — a path they can open, a number they can compare, a command they can re-run. Claims that arrive without evidence make the reviewer redo the work, which is the cost the report existed to save.
+A closeout is read by someone deciding whether to trust the work without redoing it, and that decision runs on **evidence** — a path they can open, a number they can compare, a command they can re-run. Claims that arrive without evidence make the reviewer redo the work, which is the cost the report existed to save.
 
 A result that failed, closed out with its full trail, is a good closeout: the trail is the deliverable in that case.
 
@@ -22,8 +22,8 @@ This is where the pack's reporting conventions are defined; other skills point h
   | `STOPPED` | stopped short — a budget fuse, a two-strike failure, a conflict to resolve |
   | `DONE` | finished and closed out |
 
-  Fixed set means fixed: a word invented for one message costs the human the glance the convention exists to buy.
-- **The wait token.** A message that needs the human to act ends with one fixed token alone on the final line — `WAITING_FOR_HUMAN`. Messages that are pure progress narration end without it. The token keeps its meaning exactly as long as it fires only when action is genuinely needed; on every message, it is noise the human learns to skip.
+  Choose from the four. A state that fits none of them is `STOPPED`, with the reason on the next line.
+- **The wait token.** A message that needs the human to act ends with one fixed token alone on the final line — `WAITING_FOR_HUMAN`. It is reserved for exactly that case, which is what keeps it meaning something when it appears.
 - **`[UNVERIFIED]` marks the unchecked.** Version numbers, licence terms, quota limits, "this is fixed" — anything not confirmed at its source this session carries the tag inline, so a reviewer can tell a checked statement from a confident one.
 
 ## 2. Write the report
@@ -37,10 +37,21 @@ The report is a file on disk. The chat message is a copy of part of it, never a 
 5. **Prove the background is clear.** Query the tooling for every background process this session started and account for each one. Anything meant to outlive the report is declared with a receipt a later session can check by itself: an absolute output path, a PID, or a log file's absolute path. A name only this session knows is not a receipt.
 6. **Write the chat-summary section inside the report** — status word, the three-to-five line result, the paths a human needs to open, the wait token if action is needed.
 7. **Send that section verbatim.** Copy it out of the file; a summary rewritten from memory late in a long session drifts, and drift runs toward the flattering version.
+8. **Leave the log a pointer.** One `closeout` entry — the result in a line, the report's path as its Target — so the next session finds this report by reading the log rather than by knowing it exists. Run the `decision-log` skill for the entry format.
 
 ## 3. Completion criteria
 
-Read the report as the reviewer: **for every acceptance line, can you point at the evidence without asking a question?** Then check these four, each of which is a yes or a no: every background process this session started is accounted for; every human contribution names who supplied it; every statement not confirmed at its source this session carries `[UNVERIFIED]`; and the budget line reports a count against the fuse. Finally, the chat message matches the report's summary section character for character — a message that differs is not this report's summary.
+Read the report as the reviewer: **for every acceptance line, can you point at the evidence without asking a question?**
+
+Then five checks with a yes-or-no answer each:
+
+- every background process this session started is named, with how it ended
+- every gate folder this task opened has an empty `NG/`
+- the budget line reports a count against the fuse
+- the log carries a `closeout` entry whose Target is this report
+- the chat message matches the report's summary section character for character
+
+The two things that stay a judgment — that human contributions are credited to whoever supplied them, and that unconfirmed statements carry `[UNVERIFIED]` — cannot be checked by counting, because both ask about something that *should* be in the report and isn't. Re-read for those two specifically, comparing against the log entries rather than against your memory of the session.
 
 ## Report template
 

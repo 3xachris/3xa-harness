@@ -5,11 +5,11 @@ description: Diagnose a hard error in six ordered stages — reproduce, minimise
 
 # Staged Diagnosis
 
-The six stages are ordered because each one produces the evidence the next one runs on, and a stage is finished when it has produced that thing. Acting on a guess before its stage has produced anything leaves an unexplained edit behind, which the next investigation then has to account for.
+The six stages are ordered because each one produces the evidence the next one runs on, and a stage is finished when it has produced that thing. Each edit made before its stage has produced evidence is one the next investigation has to account for.
 
 ## The six stages
 
-1. **Reproduce** — pin the exact trigger: command, input, environment flags, machine state. *Produces:* a repeatable path to the failure. When it will not reproduce on demand, collect observations across runs and record what varies; a single sighting describes a symptom, and the shape of the intermittency is itself the strongest clue available.
+1. **Reproduce** — get to one command you can re-run that goes **red** on this failure: the trigger, its input, its environment flags, its machine state. *Produces:* that command, and the red result it gives. A path you can walk by hand is the weaker version of this and only acceptable while the automatic one is out of reach — everything downstream is measured by whether this goes green, so a loop you have to drive by hand slows every later stage. Where it fires only sometimes, run it repeatedly and record what varies; the shape of the intermittency is the strongest clue on offer.
 2. **Minimise** — cut away everything the failure survives without, until it sits in one layer: the script, the service, the data, the encoding, the environment. *Produces:* the smallest case that still fails, and the layer it lives in.
 3. **Hypothesise** — write the causal claim down in one sentence, in terms of that layer. *Produces:* a statement specific enough to be wrong. Check the project's own record of past failures first — a familiar shape is a precedent to apply, not a discovery to repeat.
 4. **Instrument** — put the hypothesis in front of evidence: a log line, a printed value, a breakpoint, a checksum. *Produces:* a measurement that confirms or kills the claim. Edits belong after this stage, so that what gets changed is what the evidence pointed at.

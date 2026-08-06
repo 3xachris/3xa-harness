@@ -64,7 +64,7 @@ npx skills@latest add 3xachris/3xa-harness
 
 | skill | 一句話用法 |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到過關，而不是每撞一次牆就回頭要人 |
+| [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、素材與其授權、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到過關，而不是每撞一次牆就回頭要人 |
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `NG/` 子夾），代理停在那裡等你；你不滿意哪個，拖進 `NG/` 就是表態，一個字都不用打 |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | 一份 append-only 日誌，每條開頭一行固定格式索引行，內容只指路不複製；另在專案「每次都會載入的那份檔案」裝一行指標，下一顆代理不用人講就會自己去讀 |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 每條驗收都用證據回答、人給的診斷歸給人、背景任務關掉要有憑據、聊天訊息從報告裡原文複製出來 |
