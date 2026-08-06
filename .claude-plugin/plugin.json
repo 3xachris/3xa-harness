@@ -1,0 +1,17 @@
+{
+  "name": "3xa-harness",
+  "version": "0.1.0",
+  "description": "Two production-tested skills for running AI agents on long-lived real projects: gate sensory outputs behind human review, and keep an append-only decision log that survives context resets.",
+  "author": {
+    "name": "3xachris"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "human-in-the-loop",
+    "review-gate",
+    "decision-log",
+    "sop"
+  ]
+}

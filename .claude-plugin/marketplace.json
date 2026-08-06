@@ -1,0 +1,18 @@
+{
+  "name": "3xa-harness",
+  "owner": {
+    "name": "3xachris"
+  },
+  "metadata": {
+    "description": "Marketplace hosting the 3xa-harness skill pack."
+  },
+  "plugins": [
+    {
+      "name": "3xa-harness",
+      "description": "Two production-tested skills for running AI agents on long-lived real projects: gate sensory outputs behind human review, and keep an append-only decision log that survives context resets.",
+      "version": "0.1.0",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
