@@ -1,58 +1,87 @@
 # 3xa-harness
 
-兩顆 Agent Skill
-從真實產線長期跑 AI 代理的經驗蒸餾出來
-免費、MIT 授權、一分鐘內裝好
+給長期跑真實工作的 AI 代理用的紀律 skill——專治那些「慢慢壞掉」的環節
 
-## 這解決什麼問題
+四顆 skill 圍成一個迴圈：**凍結**任務是什麼、**卡閘**只有人能判的東西、**當下記錄**每個決策、**用證據結案**
+另有兩顆選配加裝
+MIT 授權、零依賴、一分鐘內裝好
 
-長期用 AI 代理跑真實專案，會反覆撞到兩個一般 prompt 技巧解不掉的坑
+## 這是用來解決什麼的
 
-- **感官判斷被代理自己假裝過了**
-  代理看一眼圖、聽一段音檔、看一次算圖結果，自己判定沒問題就往下走
-  但「語言模型看起來沒問題」跟「真正要面對這個產出的人看起來沒問題」是兩件事
-  等人類發現不對，代理往往已經在有問題的素材上疊了好幾步
+短任務怎麼做都不太會出事
+跑上好幾週的工作會壞在 prompt 技巧碰不到的地方
 
-- **決策說過就消失**
-  一次駁回、一次糾正、一句「為什麼當初這樣做」只在對話裡講過一次，之後再也找不到
-  下一個 session、或換一顆代理接手，沒有辦法找到這段紀錄
-  結果不是重蹈覆轍、就是同一個爭論再吵一次
+- **範圍在施工中自己長大**
+  交出來的東西已經不是當初講定的那個，而且沒人指得出是哪一刻變的
 
-`sensory-gate` 與 `decision-log` 就是解掉這兩個問題的兩套機制
-不是空泛的 prompt 建議——每一條都有具體、可核對的形狀:一個資料夾、一個 grep 得到的關鍵字、一行冷讀也信得過的索引行
-代理做得到,人也能從同一份磁碟現況核對它有沒有真的做到
+- **感官判斷被代理自己模擬掉**
+  代理看一眼算圖結果，判定沒問題，接著在上面疊三步
+  「語言模型看起來沒問題」跟「要扛這支片上架的人看起來沒問題」是兩件事
 
-**誠實邊界**:這裡提供的是紀律、不是強制力
-沒有任何機制擋著代理不去跳過某一步——這些協議之所以有效,是因為寫得夠具體、代理照著做得到,不是因為背後有 hook 卡住它
-如果想要同樣的機制、但背後真的有 hook 會在代理讀取 gate 資料夾實際狀態前卡住它繼續執行,那是付費層才有的東西,不在這份免費 repo 裡
+- **決策說過就蒸發**
+  一次駁回、一次糾正只在對話裡講過一次，下一次 context 重置就沒了
+  於是同一個錯誤、或同一場爭論，再來一遍
+
+- **回報跑在證據前面**
+  長 session 末尾憑記憶寫的摘要會失真，而失真的方向總是往「事情做得很順」那一版偏
+
+每顆 skill 都是一個具體、可核對的機制：一份凍結的文件、一個把不要的檔案拖進去的資料夾、一行 grep 得到的索引行、一份結案訊息直接複製出來的報告
+代理做得到，人也能從同一份磁碟現況核對它有沒有真的做到
+
+## 安裝
+
+一個 marketplace、三顆 plugin——先裝核心，其他按需要加
+
+```bash
+claude plugin marketplace add https://github.com/3xachris/3xa-harness
+claude plugin install harness-core@3xa-harness
+```
+
+| plugin | 裝了會多什麼 |
+|---|---|
+| `harness-core` | 四顆一組的紀律迴圈：`workorder`、`sensory-gate`、`decision-log`、`honest-closeout` |
+| `harness-debug` | `staged-diagnosis`——六個依序推進的階段，給那種看一眼看不出來的錯 |
+| `harness-router` | `/ask-harness`——講你現在的處境，它告訴你該用哪顆 |
+
+```bash
+claude plugin install harness-debug@3xa-harness
+claude plugin install harness-router@3xa-harness
+```
+
+裝好之後正常描述任務就好——「開工前先把這件事凍下來」「幫我審這批算圖」「記一下我們為什麼放棄這個做法」——對得上的 skill 會自己觸發
+`/ask-harness` 是唯一要用手打的那顆
+
+**其他代理工具**：核心四顆放在 `skills/core/<名稱>/SKILL.md`，同時也宣告在 `.claude-plugin/` 裡，兩種格式的工具（例如 [skills.sh](https://skills.sh)）都讀得到同一份 repo
+加裝項放在 `addons/`，宣告在同樣的 manifest 內
 
 ## 包裡有什麼
 
 | skill | 一句話用法 |
 |---|---|
-| [`sensory-gate`](skills/sensory-gate/SKILL.md) | 叫代理把圖／音／影輸出集中丟進一個 gate 資料夾（內建 NG 子夾），代理會停下等你——你不滿意哪個檔案，直接拖進 NG 就是表態，不用多寫一個字 |
-| [`decision-log`](skills/decision-log/SKILL.md) | 叫代理把一個決策、駁回、或糾正記進日誌，它會在同一份持續累積的檔案裡補一條精簡、有索引行的紀錄——之後不管是換一個 session 還是換一顆代理接手，冷讀都找得到、也信得過 |
+| [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到過關，而不是每撞一次牆就回頭要人 |
+| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `NG/` 子夾），代理停在那裡等你；你不滿意哪個，拖進 `NG/` 就是表態，一個字都不用打 |
+| [`decision-log`](skills/core/decision-log/SKILL.md) | 一份 append-only 日誌，每條開頭一行固定格式索引行，內容只指路不複製——寫給那個對這次 session 毫無記憶的下一個接手者看 |
+| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 每條驗收都用證據回答、人給的診斷歸給人、背景任務關掉要有憑據、聊天訊息從報告裡原文複製出來 |
+| [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | 重現 → 最小化 → 假設 → 打點 → 修復 → 回歸，每一階段產出的東西就是下一階段要用的材料 |
+| [`/ask-harness`](addons/router/skills/ask-harness/SKILL.md) | 地圖：主幹迴圈、幾條 on-ramp、以及你現在這個處境該用哪顆 |
 
-每顆 skill 都自成一體：方言規則（格式與詞彙）→ 工作順序（一步步怎麼做）→ 收尾強制條款（產出後代理要從第一次使用者的視角驗一次，才能宣稱做完）
+每顆 skill 都帶著自己的規則、步驟、一條可核對的完成判準，以及一份 `CASES.md`——記錄「哪一次翻車換來這條規則」
 
-## 安裝
+## 誠實邊界
 
-這是標準的 [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) plugin marketplace 格式——一份 repo，Claude Code 與其他相容 Agent Skills 規範的工具都能裝
+這裡給的是紀律、不是強制力
+沒有任何東西擋著代理跳過某一步——這些協議之所以有效，是因為寫得夠具體、跟得動，而且跳過了看得出來
+真的要在物理上卡死一道閘，那是你自己專案裡的 hook 該做的事，而且值得寫
 
-```bash
-claude plugin marketplace add https://github.com/3xachris/3xa-harness
-claude plugin install 3xa-harness@3xa-harness
-```
+## 出處
 
-裝好之後正常描述任務就好——「幫我審這批算圖結果」「記一下我們為什麼放棄這個做法」——對得上的 skill 會自己觸發
+書寫標準採用 Matt Pocock 的 [`writing-for-agents`](https://github.com/mattpocock/skills)：正向目標優先於禁令、一個意思只在一處定義、完成判準要可檢查且窮盡
+`staged-diagnosis` 的階段順序是同一份 repo 裡 `/diagnosing-bugs` 的通用化版本
+兩者皆 MIT
+
+English: [README.md](README.md)
 
 ## 授權
 
 MIT——見 [LICENSE](LICENSE)
 拿去用、拿去改、包進你自己的產品都可以
-
-## 現況
-
-這是免費、通用層的完整版本——兩顆 skill 的機制本身沒有藏一手
-另有一個付費層（真實事故的判例集、更多工作流模組、配套工具）給想要更完整系統的團隊
-付費層不在這份 repo 裡

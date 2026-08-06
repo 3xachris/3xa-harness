@@ -1,0 +1,19 @@
+{
+  "name": "harness-router",
+  "version": "0.2.0",
+  "description": "Ask which harness skill fits the situation you're in — a map of the discipline loop and its on-ramps, for humans who'd rather ask than remember.",
+  "author": {
+    "name": "3xachris"
+  },
+  "repository": "https://github.com/3xachris/3xa-harness",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "router",
+    "index"
+  ],
+  "skills": [
+    "./skills/ask-harness"
+  ]
+}

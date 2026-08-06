@@ -3,16 +3,62 @@
   "owner": {
     "name": "3xachris"
   },
+  "description": "Discipline skills for agents doing long-running real work: freeze the scope, gate what only a human can judge, log the decisions, close out honestly.",
   "metadata": {
-    "description": "Marketplace hosting the 3xa-harness skill pack."
+    "description": "Discipline skills for agents doing long-running real work: freeze the scope, gate what only a human can judge, log the decisions, close out honestly."
   },
   "plugins": [
     {
-      "name": "3xa-harness",
-      "description": "Two production-tested skills for running AI agents on long-lived real projects: gate sensory outputs behind human review, and keep an append-only decision log that survives context resets.",
-      "version": "0.1.0",
+      "name": "harness-core",
       "source": "./",
-      "category": "productivity"
+      "description": "The four-skill discipline loop for long-running agent work: freeze a task's scope into a workorder, gate sensory output behind human review, log decisions so they survive a context reset, and close out with evidence instead of claims.",
+      "version": "0.2.0",
+      "category": "productivity",
+      "keywords": [
+        "agent-skills",
+        "human-in-the-loop",
+        "review-gate",
+        "decision-log",
+        "workorder",
+        "closeout"
+      ],
+      "skills": [
+        "./skills/core/workorder",
+        "./skills/core/sensory-gate",
+        "./skills/core/decision-log",
+        "./skills/core/honest-closeout"
+      ]
+    },
+    {
+      "name": "harness-debug",
+      "source": "./addons/debug",
+      "description": "Six-stage diagnosis order for hard errors: reproduce, minimise, hypothesise, instrument, fix, regression-test — one stage's output is the next stage's entry ticket.",
+      "version": "0.2.0",
+      "category": "productivity",
+      "keywords": [
+        "agent-skills",
+        "debugging",
+        "diagnosis",
+        "root-cause"
+      ],
+      "skills": [
+        "./skills/staged-diagnosis"
+      ]
+    },
+    {
+      "name": "harness-router",
+      "source": "./addons/router",
+      "description": "Ask which harness skill fits the situation you're in — a map of the discipline loop and its on-ramps, for humans who'd rather ask than remember.",
+      "version": "0.2.0",
+      "category": "productivity",
+      "keywords": [
+        "agent-skills",
+        "router",
+        "index"
+      ],
+      "skills": [
+        "./skills/ask-harness"
+      ]
     }
   ]
 }

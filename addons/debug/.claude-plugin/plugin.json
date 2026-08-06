@@ -1,0 +1,20 @@
+{
+  "name": "harness-debug",
+  "version": "0.2.0",
+  "description": "Six-stage diagnosis order for hard errors: reproduce, minimise, hypothesise, instrument, fix, regression-test — one stage's output is the next stage's entry ticket.",
+  "author": {
+    "name": "3xachris"
+  },
+  "repository": "https://github.com/3xachris/3xa-harness",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "debugging",
+    "diagnosis",
+    "root-cause"
+  ],
+  "skills": [
+    "./skills/staged-diagnosis"
+  ]
+}

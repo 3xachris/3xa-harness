@@ -1,10 +1,11 @@
 {
-  "name": "3xa-harness",
-  "version": "0.1.0",
-  "description": "Two production-tested skills for running AI agents on long-lived real projects: gate sensory outputs behind human review, and keep an append-only decision log that survives context resets.",
+  "name": "harness-core",
+  "version": "0.2.0",
+  "description": "The four-skill discipline loop for long-running agent work: freeze a task's scope into a workorder, gate sensory output behind human review, log decisions so they survive a context reset, and close out with evidence instead of claims.",
   "author": {
     "name": "3xachris"
   },
+  "repository": "https://github.com/3xachris/3xa-harness",
   "license": "MIT",
   "keywords": [
     "agent-skills",
@@ -12,6 +13,13 @@
     "human-in-the-loop",
     "review-gate",
     "decision-log",
-    "sop"
+    "workorder",
+    "closeout"
+  ],
+  "skills": [
+    "./skills/core/workorder",
+    "./skills/core/sensory-gate",
+    "./skills/core/decision-log",
+    "./skills/core/honest-closeout"
   ]
 }
