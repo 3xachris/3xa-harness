@@ -37,7 +37,13 @@ claude plugin install harness-router@3xa-harness
 
 Then describe the task normally — "freeze this before we start", "review this batch of renders", "log why we dropped approach X" — and the matching skill fires on its own. `/ask-harness` is the one you type.
 
-**Other agents.** The core skills sit at `skills/core/<name>/SKILL.md` and are declared in `.claude-plugin/`, so tools that read either layout — [skills.sh](https://skills.sh), for one — pick them up from the same repo. The add-ons live under `addons/`, declared in the same manifests.
+**Other agents.** [skills.sh](https://skills.sh) reads the same repo — the core skills sit at `skills/core/<name>/SKILL.md` and every skill is declared in `.claude-plugin/`, both layouts it understands:
+
+```bash
+npx skills@latest add 3xachris/3xa-harness
+```
+
+**Pick one route.** The plugin is a managed bundle you subscribe to; skills.sh copies editable files you own. Installing both leaves you with every skill twice.
 
 ## What's inside
 
@@ -45,12 +51,22 @@ Then describe the task normally — "freeze this before we start", "review this 
 |---|---|
 | [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to done in one pass instead of returning at every bump. |
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with an `NG/` subfolder; the agent holds there, and you reject by dragging a file into `NG/`. Nothing to write. |
-| [`decision-log`](skills/core/decision-log/SKILL.md) | One append-only log, each entry opening with a fixed index line and pointing at where the detail lives — written for the session that arrives with no memory of this one. |
+| [`decision-log`](skills/core/decision-log/SKILL.md) | One append-only log, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session, so the next agent opens the log without being told. |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Reproduce → minimise → hypothesise → instrument → fix → regression-test, each stage producing what the next one runs on. |
 | [`/ask-harness`](addons/router/skills/ask-harness/SKILL.md) | The map: the loop, its on-ramps, and which skill answers the situation you're in. |
 
 Each skill carries its rules, its steps, and a completion criterion you can check. The four core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
+
+## It's working if
+
+Signals you can check in your own work, without opening a `SKILL.md`:
+
+- The agent asks its questions **at the start**, in one round, instead of stopping every twenty minutes for a decision it could have raised up front.
+- A review request arrives as **one folder and one plain question**, and answering it takes a drag rather than a paragraph.
+- A fresh session opens the decision log **before** it opens the code, and stops re-litigating things you settled last week.
+- A completion report tells you where the evidence is for each thing it claims — and says plainly when something failed, instead of arriving polished with the failure sanded off.
+- You find yourself checking the disk to verify a claim, and the disk agrees.
 
 ## Honest boundary
 

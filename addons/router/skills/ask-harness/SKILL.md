@@ -20,7 +20,7 @@ The route almost all work travels, once per task.
 
 3. **`sensory-gate`** — when the work produces something only eyes or ears can judge, the whole batch goes into one gate folder with an `NG/` subfolder, and the task holds there until you answer. Rejecting is a drag into `NG/` — the skill defines what the folder means and when. Skip this step and the human's sign-off is being simulated by the thing asking for it.
 
-4. **`decision-log`** — running underneath the whole loop, not after it. Every decision, rejection, or correction gets a short entry with a fixed index line, pointing at where the detail lives. This is what a fresh session or a different agent reads when the context is gone.
+4. **`decision-log`** — running underneath the whole loop, not after it. Every decision, rejection, or correction gets a short entry with a fixed index line, pointing at where the detail lives. It also installs the one-line pointer in the file your project loads every session, which is what actually gets the log read by an agent that has never seen this work.
 
 5. **`honest-closeout`** — the report: every acceptance line answered with evidence, human corrections credited, refuted hypotheses kept, background processes proven stopped, and the chat message copied verbatim out of the file. It also defines the status words and the wait token the other skills use.
 
@@ -32,7 +32,7 @@ A situation that starts work and merges into the loop.
 
 - **Something is broken** → **`staged-diagnosis`** (plugin: `harness-debug`). Six stages, each producing what the next one runs on: reproduce, minimise, hypothesise, instrument, fix, regression-test. Reach for it on the failure that resists a first look — the flake, the silent wrong answer, the regression between two known-good states. Its output is evidence, so it feeds straight into the closeout.
 
-- **A fresh session is taking over** → open with **`decision-log`** rather than the code. The log holds the decisions the previous session made and the reasons that never made it into a diff.
+- **A fresh session is taking over** → the log should already be pointed at from the file this project always loads, so this needs no skill. Where that pointer is missing, **`decision-log`** installs it — one line, once per project.
 
 - **You are being asked to approve something you cannot see** → the answer is a gate, not a better description. Ask for the batch in a gate folder and answer with `NG/`.
 

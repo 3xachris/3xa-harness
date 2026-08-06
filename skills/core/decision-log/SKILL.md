@@ -19,17 +19,29 @@ That reader has one requirement above all others. They must be able to tell, fro
 - **A running summary sits at the top** — open items, current focus, counts — updated in the same edit as the entry below it. It gives the current state in one glance, and it is trustworthy only as long as it is never updated separately from the entries.
 - **Split at 200 KB.** File-reading tools start truncating a live log well before it feels large, and a silently truncated log is worse than a missing one. 200 KB is the number to act on, not to wait for: older entries move to a dated archive, the live file keeps the current period, and both the summary and the archive index are updated in the same pass.
 
-## 2. Read first, then log the moment
+## 2. Install the pointer, once per project
 
-1. **Open the log before the work**, whenever you are picking up a project this session did not start. The entries hold the decisions and the reasons that never made it into a diff, and reading them takes a fraction of the time spent re-deriving them.
-2. **Write the entry as the decision happens.** Recall at the end of a long session smooths over the parts that were contested — which are the parts a later reader came for.
-3. **Give the decision a home.** Before writing, ask where the detail belongs: a spec, a config, a design doc, a backlog item. That path goes in the index line's Target field. When no home exists yet, create it in this same turn — a decision whose only home is one log line is a decision the next search will not surface.
-4. **Log the surviving need beside a rejection.** Turning down a proposal leaves the problem it addressed standing. Record that problem as its own findable item — a backlog entry, an open question, a ticket — so it outlives the approach that failed to solve it.
-5. **Check the file size on the way out.** If the live file has crossed 200 KB, split it now, in this session.
+A log that nothing points at is read by whoever already knew it was there. What makes it reach a session that has no memory of this one is a line in the file that project loads every time — `CLAUDE.md`, `AGENTS.md`, or whatever the harness always reads:
 
-## 3. Completion criteria
+```markdown
+## Decision log
 
-The log holds when **every `##` heading in it is followed by a line matching `^> Type: (decision|amendment|correction|closeout|handoff|info) \| Target: ` and every Target other than `none` resolves to something that exists on disk.** Both halves are greppable, so this is a check to run rather than a feeling to have — run it over the whole file after appending, not only over the entry you just wrote.
+`docs/decisions.md` — the decisions, rejections, and corrections made on this project,
+newest last. Read it before starting work here.
+```
+
+Install that line the first time this project gets a log, and the read side runs itself from then on: every session loads the pointer, and the pointer names the file and the moment to open it. Where a project already carries such a section, add to it rather than starting a second one.
+
+## 3. Log the moment
+
+1. **Write the entry as the decision happens.** Recall at the end of a long session smooths over the parts that were contested — which are the parts a later reader came for.
+2. **Give the decision a home.** Before writing, ask where the detail belongs: a spec, a config, a design doc, a backlog item. That path goes in the index line's Target field. When no home exists yet, create it in this same turn — a decision whose only home is one log line is a decision the next search will not surface.
+3. **Log the surviving need beside a rejection.** Turning down a proposal leaves the problem it addressed standing. Record that problem as its own findable item — a backlog entry, an open question, a ticket — so it outlives the approach that failed to solve it.
+4. **Check the file size on the way out.** If the live file has crossed 200 KB, split it now, in this session.
+
+## 4. Completion criteria
+
+The log holds when **every `##` heading in it is followed by a line matching `^> Type: (decision|amendment|correction|closeout|handoff|info) \| Target: `, every Target other than `none` resolves to something that exists on disk, and the project's always-loaded file names the log.** All three are checks to run — the first two greppable, the third a look at one file — run over the whole log after appending, not only over the entry just written.
 
 ## Entry shape
 

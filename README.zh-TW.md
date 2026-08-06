@@ -51,8 +51,14 @@ claude plugin install harness-router@3xa-harness
 裝好之後正常描述任務就好——「開工前先把這件事凍下來」「幫我審這批算圖」「記一下我們為什麼放棄這個做法」——對得上的 skill 會自己觸發
 `/ask-harness` 是唯一要用手打的那顆
 
-**其他代理工具**：核心四顆放在 `skills/core/<名稱>/SKILL.md`，同時也宣告在 `.claude-plugin/` 裡，兩種格式的工具（例如 [skills.sh](https://skills.sh)）都讀得到同一份 repo
-加裝項放在 `addons/`，宣告在同樣的 manifest 內
+**其他代理工具**：[skills.sh](https://skills.sh) 讀同一份 repo——核心四顆放在 `skills/core/<名稱>/SKILL.md`，全部 skill 也都宣告在 `.claude-plugin/` 裡，兩種格式它都懂
+
+```bash
+npx skills@latest add 3xachris/3xa-harness
+```
+
+**兩條路擇一**：plugin 是你訂閱的託管包、skills.sh 是複製成你自己可改的檔案
+兩邊都裝＝每顆 skill 都有兩份
 
 ## 包裡有什麼
 
@@ -60,13 +66,23 @@ claude plugin install harness-router@3xa-harness
 |---|---|
 | [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到過關，而不是每撞一次牆就回頭要人 |
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `NG/` 子夾），代理停在那裡等你；你不滿意哪個，拖進 `NG/` 就是表態，一個字都不用打 |
-| [`decision-log`](skills/core/decision-log/SKILL.md) | 一份 append-only 日誌，每條開頭一行固定格式索引行，內容只指路不複製——寫給那個對這次 session 毫無記憶的下一個接手者看 |
+| [`decision-log`](skills/core/decision-log/SKILL.md) | 一份 append-only 日誌，每條開頭一行固定格式索引行，內容只指路不複製；另在專案「每次都會載入的那份檔案」裝一行指標，下一顆代理不用人講就會自己去讀 |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 每條驗收都用證據回答、人給的診斷歸給人、背景任務關掉要有憑據、聊天訊息從報告裡原文複製出來 |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | 重現 → 最小化 → 假設 → 打點 → 修復 → 回歸，每一階段產出的東西就是下一階段要用的材料 |
 | [`/ask-harness`](addons/router/skills/ask-harness/SKILL.md) | 地圖：主幹迴圈、幾條 on-ramp、以及你現在這個處境該用哪顆 |
 
 每顆 skill 都帶著自己的規則、步驟、一條可核對的完成判準
 核心四顆另附一份 `CASES.md`——記錄「哪一次翻車換來這條規則」，已通用化
+
+## 有在運作的話，你會看到
+
+不用打開任何 `SKILL.md`，在自己的工作裡就能核對的訊號
+
+- 代理把問題**一次問在開頭**，而不是每二十分鐘停下來問一個本來就該先問的決定
+- 要你審的東西是**一個資料夾＋一句白話問題**，回答只要拖檔案，不用打一段字
+- 新開的 session **先開決策日誌再開程式碼**，不再把你上週定案的事重吵一遍
+- 結案報告會告訴你每個宣稱的證據在哪；失敗就直說失敗，而不是磨得漂漂亮亮把失敗磨掉
+- 你想去磁碟上查核某個宣稱時，磁碟跟它講的一樣
 
 ## 誠實邊界
 

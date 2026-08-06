@@ -13,7 +13,16 @@ A result that failed, closed out with its full trail, is a good closeout: the tr
 
 This is where the pack's reporting conventions are defined; other skills point here rather than restate them.
 
-- **Status first.** Every message to the human opens with one word from a fixed set — `WORKING` / `GATE-HOLD` / `STOPPED` / `DONE` — so the state of the task is readable before the second word. Fixed set means fixed: a new word invented for one message costs the human the glance the convention exists to buy.
+- **Status first.** Every message to the human opens with one word from a fixed set, so the state of the task is readable before the second word:
+
+  | Word | The task is |
+  |---|---|
+  | `WORKING` | running; nothing needed from you |
+  | `GATE-HOLD` | stopped at a review gate, waiting on your judgment |
+  | `STOPPED` | stopped short — a budget fuse, a two-strike failure, a conflict to resolve |
+  | `DONE` | finished and closed out |
+
+  Fixed set means fixed: a word invented for one message costs the human the glance the convention exists to buy.
 - **The wait token.** A message that needs the human to act ends with one fixed token alone on the final line — `WAITING_FOR_HUMAN`. Messages that are pure progress narration end without it. The token keeps its meaning exactly as long as it fires only when action is genuinely needed; on every message, it is noise the human learns to skip.
 - **`[UNVERIFIED]` marks the unchecked.** Version numbers, licence terms, quota limits, "this is fixed" — anything not confirmed at its source this session carries the tag inline, so a reviewer can tell a checked statement from a confident one.
 

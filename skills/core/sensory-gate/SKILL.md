@@ -11,7 +11,14 @@ This skill spends that attention well: one batch, one folder, one question, one 
 
 ## 1. The gate
 
-- **Gate folder** — one folder holding everything from this review round. Above three items, the folder's absolute path is the entire ask; at three or fewer, list each file's own absolute path, because opening a folder to find two files adds a click for nothing.
+- **Gate folder** — one folder holding everything from this review round. How you hand it over depends only on size:
+
+  | Batch | What the message carries |
+  |---|---|
+  | 4 or more | The gate folder's absolute path, alone |
+  | 3 or fewer | Each file's own absolute path, listed |
+
+  A folder path for two files adds a click for nothing; a file list for twelve is a wall.
 - **`NG/` subfolder** — created inside the gate folder *before* the human is asked. Dragging a file into `NG/` **is** the rejection; no comment, no form, no reply needed. Read the folder's real contents on disk to learn the verdict — the disk is where the human answered.
 - **Approval needs an answer, not just an empty `NG/`.** An empty folder means "nothing rejected" only once the human has replied; before that it means "not looked at yet", and the two are indistinguishable from disk alone. So the gate opens on the reply and reads the folder second. When the reply names rejects in words instead of moving files — *"the third one is wrong"* — that is a rejection: move those files into `NG/` yourself, say which ones you moved, and carry on from the same state the drag would have produced.
 - **One-click open.** Where the chat client renders a run button on shell code blocks, hand over a runnable command — `explorer "<path>"` on Windows, `open "<path>"` on macOS, `xdg-open "<path>"` on Linux — alongside the plain path, which works everywhere. For a small batch, `explorer /select,"<file>"` opens the folder with that file already highlighted.
@@ -21,7 +28,7 @@ This skill spends that attention well: one batch, one folder, one question, one 
 - **Real pipeline, real file.** What reaches the gate is what the production path actually produces, opened from disk. An editor's preview pane renders with its own quirks, and those quirks get reported as defects in the asset; a shortcut build gets judged and then can't be reproduced.
 - **1:1 for fine detail.** A contact sheet locates which item to look at. Signing off on hands, small text, edges, or single frames takes a crop at full scale or greater of that exact region — at thumbnail scale the defect and its absence look identical.
 
-The status words this message uses — `GATE-HOLD` to open the gate, `WAITING_FOR_HUMAN` to close the message — belong to the pack's reporting vocabulary, defined in [`honest-closeout`](../honest-closeout/SKILL.md).
+The status words this message uses — `GATE-HOLD` to open the gate, `WAITING_FOR_HUMAN` to close the message — belong to the pack's reporting vocabulary. Run the `honest-closeout` skill for it; that skill owns the definitions and this one uses them.
 
 ## 2. Run the gate
 
