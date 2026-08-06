@@ -9,7 +9,6 @@
   "license": "MIT",
   "keywords": [
     "agent-skills",
-    "claude-code",
     "human-in-the-loop",
     "review-gate",
     "decision-log",

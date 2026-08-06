@@ -37,10 +37,21 @@ claude plugin marketplace add https://github.com/3xachris/3xa-harness
 claude plugin install harness-core@3xa-harness
 ```
 
+Codex 使用者可把同一組四顆核心 skill 複製到使用者 skill 目錄
+
+```powershell
+$dest = Join-Path $HOME '.agents\skills'
+New-Item -ItemType Directory -Force $dest | Out-Null
+Copy-Item skills\core\workorder,skills\core\sensory-gate,skills\core\decision-log,skills\core\honest-closeout -Destination $dest -Recurse -Force
+Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\honest-closeout -Filter SKILL.md
+```
+
+最後一行應列出四個 `SKILL.md`；開一個新的 Codex session，描述一個符合情境的任務，確認 skill 已被發現並觸發
+
 | plugin | 裝了會多什麼 |
 |---|---|
 | `harness-core` | 四顆一組的紀律迴圈：`workorder`、`sensory-gate`、`decision-log`、`honest-closeout` |
-| `harness-debug` | `staged-diagnosis`——六個依序推進的階段，給那種看一眼看不出來的錯 |
+| `harness-debug` | `staged-diagnosis`——核心診斷迴圈的完整加強版，給那種看一眼看不出來的錯 |
 
 ```bash
 claude plugin install harness-debug@3xa-harness
@@ -55,16 +66,15 @@ claude plugin install harness-debug@3xa-harness
 npx skills@latest add 3xachris/3xa-harness
 ```
 
-**兩條路擇一**：plugin 是你訂閱的託管包、skills.sh 是複製成你自己可改的檔案
-兩邊都裝＝每顆 skill 都有兩份
+**三條路擇一：Claude plugin、Codex 使用者 skill，或 skills.sh**；每條路徑都會安裝同一組 skill，選超過一條會讓每顆 skill 出現兩次
 
 ## 包裡有什麼
 
 | skill | 一句話用法 |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、素材與其授權、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到 `DONE`、`CLOSED-FAILED` 或 `STOPPED`，而不是每撞一次牆就回頭要人 |
+| [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、素材與其授權、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到 `DONE`、`CLOSED-FAILED` 或 `STOPPED`；遇到難查的失敗就用核心診斷迴圈，選配的 `staged-diagnosis` 是它的加強版 |
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `rejects/` 子夾），代理停在那裡等你；你不滿意哪個，拖進 `rejects/` 就是表態，一個字都不用打 |
-| [`decision-log`](skills/core/decision-log/SKILL.md) | 一份 append-only 日誌，每條開頭一行固定格式索引行，內容只指路不複製；另在專案「每次都會載入的那份檔案」裝一行指標，下一顆代理不用人講就會自己去讀 |
+| [`decision-log`](skills/core/decision-log/SKILL.md) | 一份條目 append-only、頂端摘要可維護的日誌，每條開頭一行固定格式索引行，內容只指路不複製；另在專案「每次都會載入的那份檔案」裝一行指標 |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 每條驗收都用證據回答、人給的診斷歸給人、背景任務關掉要有憑據、聊天訊息從報告裡原文複製出來 |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | 重現 → 最小化 → 假設 → 打點 → 修復 → 回歸，每一階段產出的東西就是下一階段要用的材料 |
 

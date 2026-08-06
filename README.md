@@ -24,10 +24,21 @@ claude plugin marketplace add https://github.com/3xachris/3xa-harness
 claude plugin install harness-core@3xa-harness
 ```
 
+Codex users can install the same four core skills by copying their folders into the user skill directory:
+
+```powershell
+$dest = Join-Path $HOME '.agents\skills'
+New-Item -ItemType Directory -Force $dest | Out-Null
+Copy-Item skills\core\workorder,skills\core\sensory-gate,skills\core\decision-log,skills\core\honest-closeout -Destination $dest -Recurse -Force
+Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\honest-closeout -Filter SKILL.md
+```
+
+The final command should list four `SKILL.md` files. Start a new Codex session and describe a matching task to confirm the skill is discovered and invoked.
+
 | Plugin | What it adds |
 |---|---|
 | `harness-core` | The four-skill loop: `workorder`, `sensory-gate`, `decision-log`, `honest-closeout`. |
-| `harness-debug` | `staged-diagnosis` — six ordered stages for the errors that resist a first look. |
+| `harness-debug` | `staged-diagnosis` — the expanded version of the core diagnosis loop for errors that resist a first look. |
 
 ```bash
 claude plugin install harness-debug@3xa-harness
@@ -41,15 +52,15 @@ Then describe the task normally — "freeze this before we start", "review this 
 npx skills@latest add 3xachris/3xa-harness
 ```
 
-**Pick one route.** The plugin is a managed bundle you subscribe to; skills.sh copies editable files you own. Installing both leaves you with every skill twice.
+**Pick one route: Claude plugin, Codex user skills, or skills.sh.** Each route installs the same skills; choosing more than one leaves every skill twice.
 
 ## What's inside
 
 | Skill | One-line usage |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass instead of returning at every bump. |
+| [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass; resistant failures use the core diagnosis loop, with `staged-diagnosis` as its optional expanded version. |
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with a `rejects/` subfolder; the agent holds there, and you reject by dragging a file into `rejects/`. Nothing to write. |
-| [`decision-log`](skills/core/decision-log/SKILL.md) | One append-only log, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session, so the next agent opens the log without being told. |
+| [`decision-log`](skills/core/decision-log/SKILL.md) | One log with append-only entries and a maintained top summary, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session. |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Reproduce → minimise → hypothesise → instrument → fix → regression-test, each stage producing what the next one runs on. |
 

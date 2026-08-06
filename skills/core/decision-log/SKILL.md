@@ -9,18 +9,18 @@ A fresh session inherits what was written down and nothing else. The log carries
 
 ## 1. Shape of the log
 
-- **One file, append-only.** The log is a timeline: past entries stay as written, and a change of mind arrives as a new entry that references the old one. Reading it top to bottom shows how the thinking moved, which is usually the question being asked.
+- **One file with two layers.** The entry layer is append-only: once written, an entry stays as written, and a change of mind arrives as a new entry that references the old one. The summary layer is a maintained field at the top and is overwritten as the current state changes. Reading the entries top to bottom shows how the thinking moved, which is usually the question being asked.
 - **Every entry opens with an index line**, directly under its heading, in a fixed format:
   `> Type: <decision|amendment|rejection|correction|closeout> | Target: <path from the project root to where the detail lives, or the bare word `none`>`
   Five types, each with something that writes it: a choice made (`decision`), a frozen scope changed (`amendment`, from `workorder`), a human turning an artifact down (`rejection`, from `sensory-gate`), a human correcting the work (`correction`), a task finished and reported (`closeout`, from `honest-closeout`). A type nothing produces is a type the format check spends its strictness guarding for no one.
   This line is what makes an entry findable by machine and skimmable by human. Write it at the time — it is the one part of an entry that cannot be reconstructed afterwards.
 - **Entries point.** Roughly five lines: what was decided, the one-line reason, and where the full detail lives. When an entry starts growing, the content belongs in a real document and the entry belongs pointing at it.
-- **A running summary sits at the top** — open items, current focus, counts — updated in the same edit as the entry below it. It gives the current state in one glance, and stays trustworthy for exactly as long as that pairing holds.
+- **Update the summary layer** — open items, current focus, counts — in the same edit as the entry below it. It gives the current state in one glance, and stays trustworthy for exactly as long as that pairing holds.
 - **Split at a threshold you set in advance** — 200 KB unless you have a measured reason for another number. The point is having a line at all: file-reading tools truncate a long log silently, and a log you believe you read in full is worse than one you know you didn't. At the line, older entries move to a dated archive, the live file keeps the current period, and both the summary and the archive index are updated in the same pass.
 
 ## 2. Install the pointer, once per project
 
-A log that nothing points at is read by whoever already knew it was there. What makes it reach a session that has no memory of this one is a line in the file that project loads every time — `CLAUDE.md`, `AGENTS.md`, or whatever the harness always reads:
+A log that nothing points at is read by whoever already knew it was there. What makes it reach a session that has no memory of this one is a line in the project's always-loaded file — `AGENTS.md`, `CLAUDE.md`, or the equivalent file required by the agent harness:
 
 ```markdown
 ## Decision log
