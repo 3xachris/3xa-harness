@@ -11,28 +11,30 @@ This skill spends that attention well: one batch, one folder, one question, one 
 
 ## 1. The gate
 
-- **Gate folder** — one folder holding everything from this review round. Above a handful of items, the folder's absolute path is the entire ask; at three items or fewer, list each file's own absolute path, because opening a folder to find two files adds a click for nothing.
-- **`NG/` subfolder** — created inside the gate folder *before* the human is asked. Dragging a file into `NG/` **is** the rejection; no comment, no form, no reply needed. Everything still outside `NG/` at answer time is approved. Read the folder's real contents on disk to learn the verdict — the disk is where the human answered.
-- **One-click open.** Where the chat client renders a run button on shell code blocks, hand over a runnable command — `explorer "<path>"` on Windows, `open "<path>"` on macOS, `xdg-open "<path>"` on Linux — alongside the plain path, which works everywhere. For a small batch, `explorer /select,"<file>"` opens the folder with that file already highlighted. Build the command only from paths you constructed yourself; text from a webpage or a file of unknown origin belongs in a message, never inside a command the human will run.
+- **Gate folder** — one folder holding everything from this review round. Above three items, the folder's absolute path is the entire ask; at three or fewer, list each file's own absolute path, because opening a folder to find two files adds a click for nothing.
+- **`NG/` subfolder** — created inside the gate folder *before* the human is asked. Dragging a file into `NG/` **is** the rejection; no comment, no form, no reply needed. Read the folder's real contents on disk to learn the verdict — the disk is where the human answered.
+- **Approval needs an answer, not just an empty `NG/`.** An empty folder means "nothing rejected" only once the human has replied; before that it means "not looked at yet", and the two are indistinguishable from disk alone. So the gate opens on the reply and reads the folder second. When the reply names rejects in words instead of moving files — *"the third one is wrong"* — that is a rejection: move those files into `NG/` yourself, say which ones you moved, and carry on from the same state the drag would have produced.
+- **One-click open.** Where the chat client renders a run button on shell code blocks, hand over a runnable command — `explorer "<path>"` on Windows, `open "<path>"` on macOS, `xdg-open "<path>"` on Linux — alongside the plain path, which works everywhere. For a small batch, `explorer /select,"<file>"` opens the folder with that file already highlighted.
+- **Commands are built from your own paths.** Everything inside a command handed to a human is a path this task constructed. Text from a webpage, a document, or any file of unknown origin goes in the message body, where running it is not one click away.
 - **A question a stranger could answer.** The prompt is about the artifact, in plain language, with no vocabulary from the pipeline that made it: *"Six renders — anything wrong, drag it into NG."*
 - **Isolate what is being judged.** Send the cleanest form of the thing in question — the raw voice take rather than the finished mix, the single frame rather than the sequence — so the human's answer lands on the artifact instead of on everything wrapped around it.
 - **Real pipeline, real file.** What reaches the gate is what the production path actually produces, opened from disk. An editor's preview pane renders with its own quirks, and those quirks get reported as defects in the asset; a shortcut build gets judged and then can't be reproduced.
 - **1:1 for fine detail.** A contact sheet locates which item to look at. Signing off on hands, small text, edges, or single frames takes a crop at full scale or greater of that exact region — at thumbnail scale the defect and its absence look identical.
 
-The status word and the wait token that frame the gate message are defined in [`honest-closeout`](../honest-closeout/SKILL.md).
+The status words this message uses — `GATE-HOLD` to open the gate, `WAITING_FOR_HUMAN` to close the message — belong to the pack's reporting vocabulary, defined in [`honest-closeout`](../honest-closeout/SKILL.md).
 
 ## 2. Run the gate
 
 1. Produce the **whole batch** for this round before asking. Trickling artifacts out one at a time turns one review into six interruptions.
 2. Create the gate folder with `NG/` already inside it.
 3. Send one message: `GATE-HOLD`, the runnable open command and the plain path, the plain-language question, and the wait token on its own last line.
-4. **Hold.** The next thing this task does is read the human's answer. Re-asking, re-summarising, or starting the next stage while the gate is open all spend the human's attention on the same request twice.
-5. When they answer, read the gate folder from disk. Files inside `NG/` are rejected, full stop — that action was the verdict and it needs no confirming question.
+4. **Hold.** The next thing this task does is read the human's answer. One request, sent once, is the whole ask.
+5. When they answer, read the gate folder from disk. Files inside `NG/` are rejected, full stop — that action was the verdict and it needs no confirming question. Rejects named in words get moved into `NG/` by you, so the folder and the verdict agree.
 6. Rework the rejects into the next round; approved items move on. At final closeout, empty `NG/` yourself, so nothing already rejected can resurface in a later batch.
 
 ## 3. Completion criteria
 
-Before sending, **open the gate folder yourself** — the folder, not your memory of writing to it — and check three things: the path in the message resolves, the folder holds exactly what the message says it holds, and the question is answerable by someone who knows nothing about how the files were made. A gate the sender cannot verify in ten seconds is one the human will answer with a question instead of a decision.
+Before sending, **open the gate folder yourself** — the folder, not your memory of writing to it — and check four things: the path in the message resolves; `NG/` exists and is empty; the file count in the folder equals the count the message claims; and the question contains no word that only someone who built the pipeline would know. All four are checkable in seconds, which is roughly how long the human will spend deciding whether your message is answerable.
 
 ## Gate message
 

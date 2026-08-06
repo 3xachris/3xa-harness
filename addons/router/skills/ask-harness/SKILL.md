@@ -16,15 +16,15 @@ The route almost all work travels, once per task.
 
 1. **`workorder`** — the task gets written down and **frozen** before the first edit: one sentence, known facts, materials with their licences, pinned parameters, a budget fuse, acceptance lines, non-goals. Freezing is what makes "done" checkable later, and what keeps the work from growing while it runs.
 
-2. **The build runs to done in one pass** — build, self-verify against the acceptance lines, self-fix, re-verify. Two failures on the *same* sub-problem ends it and hands the trail back; a fresh question does not.
+2. **The build runs to done in one pass** — build, self-verify against the acceptance lines, self-fix, re-verify. This is part of `workorder`, not a skill of its own; it also defines the two-strike rule the other skills refer to.
 
-3. **`sensory-gate`** — when the work produces something only eyes or ears can judge, the whole batch goes into one gate folder with an `NG/` subfolder, and the task holds there. Rejection is a drag into `NG/`; everything left outside it is approved. Skip this step and the human's sign-off is being simulated by the thing asking for it.
+3. **`sensory-gate`** — when the work produces something only eyes or ears can judge, the whole batch goes into one gate folder with an `NG/` subfolder, and the task holds there until you answer. Rejecting is a drag into `NG/` — the skill defines what the folder means and when. Skip this step and the human's sign-off is being simulated by the thing asking for it.
 
 4. **`decision-log`** — running underneath the whole loop, not after it. Every decision, rejection, or correction gets a short entry with a fixed index line, pointing at where the detail lives. This is what a fresh session or a different agent reads when the context is gone.
 
 5. **`honest-closeout`** — the report: every acceptance line answered with evidence, human corrections credited, refuted hypotheses kept, background processes proven stopped, and the chat message copied verbatim out of the file. It also defines the status words and the wait token the other skills use.
 
-All five steps live in the **`harness-core`** plugin. Nothing here needs a repo, a tracker, or a language — the loop is the same for code, renders, audio, or writing.
+The four skills live in the **`harness-core`** plugin. Nothing here needs a repo, a tracker, or a language — the loop is the same for code, renders, audio, or writing.
 
 ## On-ramps
 
@@ -36,10 +36,6 @@ A situation that starts work and merges into the loop.
 
 - **You are being asked to approve something you cannot see** → the answer is a gate, not a better description. Ask for the batch in a gate folder and answer with `NG/`.
 
-## What this pack does not do
+## Where the boundaries and the credits live
 
-These are protocols, not enforcement. Nothing here blocks a step from being skipped — they work because they are specific enough to follow and checkable enough that skipping shows. If you want the gate physically enforced rather than agreed to, that is a hook in your own project, and it is worth writing.
-
-## Writing your own
-
-The house standard for documents like these is Matt Pocock's [`writing-for-agents`](https://github.com/mattpocock/skills) — positive targets over prohibitions, one source of truth per meaning, completion criteria that are checkable and exhaustive. This pack is written to it.
+The pack's honest boundary — these are protocols, not enforcement — and the writing standard behind them are stated once, in the [README](https://github.com/3xachris/3xa-harness#honest-boundary).

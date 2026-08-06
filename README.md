@@ -50,7 +50,7 @@ Then describe the task normally — "freeze this before we start", "review this 
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Reproduce → minimise → hypothesise → instrument → fix → regression-test, each stage producing what the next one runs on. |
 | [`/ask-harness`](addons/router/skills/ask-harness/SKILL.md) | The map: the loop, its on-ramps, and which skill answers the situation you're in. |
 
-Each skill carries its rules, its steps, a completion criterion you can check, and a `CASES.md` of the incidents that bought each rule.
+Each skill carries its rules, its steps, and a completion criterion you can check. The four core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
 
 ## Honest boundary
 

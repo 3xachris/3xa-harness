@@ -4,9 +4,6 @@
     "name": "3xachris"
   },
   "description": "Discipline skills for agents doing long-running real work: freeze the scope, gate what only a human can judge, log the decisions, close out honestly.",
-  "metadata": {
-    "description": "Discipline skills for agents doing long-running real work: freeze the scope, gate what only a human can judge, log the decisions, close out honestly."
-  },
   "plugins": [
     {
       "name": "harness-core",

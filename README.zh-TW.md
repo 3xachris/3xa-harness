@@ -65,7 +65,8 @@ claude plugin install harness-router@3xa-harness
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | 重現 → 最小化 → 假設 → 打點 → 修復 → 回歸，每一階段產出的東西就是下一階段要用的材料 |
 | [`/ask-harness`](addons/router/skills/ask-harness/SKILL.md) | 地圖：主幹迴圈、幾條 on-ramp、以及你現在這個處境該用哪顆 |
 
-每顆 skill 都帶著自己的規則、步驟、一條可核對的完成判準，以及一份 `CASES.md`——記錄「哪一次翻車換來這條規則」
+每顆 skill 都帶著自己的規則、步驟、一條可核對的完成判準
+核心四顆另附一份 `CASES.md`——記錄「哪一次翻車換來這條規則」，已通用化
 
 ## 誠實邊界
 
