@@ -2,7 +2,7 @@
 
 Discipline skills for agents doing long-running real work — the parts of the job that go wrong slowly.
 
-Four skills form one loop around a task: **freeze** what it is, **gate** what only a human can judge, **log** the decisions as they happen, **close out** with evidence. Two optional add-ons sit beside it. MIT, no dependencies, installable in under a minute.
+Four skills form one loop around a task: **freeze** what it is, **gate** what only a human can judge, **log** the decisions as they happen, **close out** with evidence. One optional add-on sits beside it. MIT, no dependencies, installable in under a minute.
 
 ## What this is for
 
@@ -17,7 +17,7 @@ Each skill is one concrete, checkable mechanism: a frozen document, a folder to 
 
 ## Install
 
-Three plugins in one marketplace — take the core, add what you need.
+Two plugins in one marketplace — take the core, add what you need.
 
 ```bash
 claude plugin marketplace add https://github.com/3xachris/3xa-harness
@@ -28,14 +28,12 @@ claude plugin install harness-core@3xa-harness
 |---|---|
 | `harness-core` | The four-skill loop: `workorder`, `sensory-gate`, `decision-log`, `honest-closeout`. |
 | `harness-debug` | `staged-diagnosis` — six ordered stages for the errors that resist a first look. |
-| `harness-router` | `ask-harness` — the map from a situation to the skill that answers it. Type it, or let the agent reach for it when the entry point isn't obvious. |
 
 ```bash
 claude plugin install harness-debug@3xa-harness
-claude plugin install harness-router@3xa-harness
 ```
 
-Then describe the task normally — "freeze this before we start", "review this batch of renders", "log why we dropped approach X" — and the matching skill fires on its own. Every skill here is model-invoked, including the router: when it isn't obvious where a piece of work enters the loop, the agent reaches for the map itself rather than waiting to be told.
+Then describe the task normally — "freeze this before we start", "review this batch of renders", "log why we dropped approach X" — and the matching skill fires on its own. Every skill here is model-invoked.
 
 **Other agents.** [skills.sh](https://skills.sh) reads the same repo — the core skills sit at `skills/core/<name>/SKILL.md` and every skill is declared in `.claude-plugin/`, both layouts it understands:
 
@@ -50,11 +48,10 @@ npx skills@latest add 3xachris/3xa-harness
 | Skill | One-line usage |
 |---|---|
 | [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to done in one pass instead of returning at every bump. |
-| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with an `NG/` subfolder; the agent holds there, and you reject by dragging a file into `NG/`. Nothing to write. |
+| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with a `rejects/` subfolder; the agent holds there, and you reject by dragging a file into `rejects/`. Nothing to write. |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | One append-only log, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session, so the next agent opens the log without being told. |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Reproduce → minimise → hypothesise → instrument → fix → regression-test, each stage producing what the next one runs on. |
-| [`ask-harness`](addons/router/skills/ask-harness/SKILL.md) | The map: the loop, its on-ramps, and which skill answers the situation in front of you. Fires on its own when the entry point isn't obvious. |
 
 Each skill carries its rules, its steps, and a completion criterion you can check. The four core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
 

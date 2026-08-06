@@ -48,7 +48,7 @@ Read the report as the reviewer: **for every acceptance line, can you point at t
 Then five checks with a yes-or-no answer each:
 
 - every background process this session started is named, with how it ended
-- every gate folder this task opened has an empty `NG/`
+- every gate folder this task opened has an empty `rejects/`
 - the budget line reports a count against the fuse
 - the log carries a `closeout` entry whose Target is this report
 - every claim about anything outside this task's own artifacts appears as a sentence somewhere in the report, not only as a field value

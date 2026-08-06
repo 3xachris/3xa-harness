@@ -3,7 +3,7 @@
 給長期跑真實工作的 AI 代理用的紀律 skill——專治那些「慢慢壞掉」的環節
 
 四顆 skill 圍成一個迴圈：**凍結**任務是什麼、**卡閘**只有人能判的東西、**當下記錄**每個決策、**用證據結案**
-另有兩顆選配加裝
+另有一顆選配加裝
 MIT 授權、零依賴、一分鐘內裝好
 
 ## 這是用來解決什麼的
@@ -30,7 +30,7 @@ MIT 授權、零依賴、一分鐘內裝好
 
 ## 安裝
 
-一個 marketplace、三顆 plugin——先裝核心，其他按需要加
+一個 marketplace、兩顆 plugin——先裝核心，其他按需要加
 
 ```bash
 claude plugin marketplace add https://github.com/3xachris/3xa-harness
@@ -41,15 +41,13 @@ claude plugin install harness-core@3xa-harness
 |---|---|
 | `harness-core` | 四顆一組的紀律迴圈：`workorder`、`sensory-gate`、`decision-log`、`honest-closeout` |
 | `harness-debug` | `staged-diagnosis`——六個依序推進的階段，給那種看一眼看不出來的錯 |
-| `harness-router` | `ask-harness`——從處境對到該用哪顆的地圖。你可以手打，也可以讓代理在「不知道該從哪裡入口」時自己去讀 |
 
 ```bash
 claude plugin install harness-debug@3xa-harness
-claude plugin install harness-router@3xa-harness
 ```
 
 裝好之後正常描述任務就好——「開工前先把這件事凍下來」「幫我審這批算圖」「記一下我們為什麼放棄這個做法」——對得上的 skill 會自己觸發
-包括 router 在內，每顆都是 model-invoked：一份工作不知道該從迴圈哪裡進來時，代理會自己去讀地圖，不等人講
+每顆都是 model-invoked
 
 **其他代理工具**：[skills.sh](https://skills.sh) 讀同一份 repo——核心四顆放在 `skills/core/<名稱>/SKILL.md`，全部 skill 也都宣告在 `.claude-plugin/` 裡，兩種格式它都懂
 
@@ -65,11 +63,10 @@ npx skills@latest add 3xachris/3xa-harness
 | skill | 一句話用法 |
 |---|---|
 | [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、素材與其授權、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到過關，而不是每撞一次牆就回頭要人 |
-| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `NG/` 子夾），代理停在那裡等你；你不滿意哪個，拖進 `NG/` 就是表態，一個字都不用打 |
+| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `rejects/` 子夾），代理停在那裡等你；你不滿意哪個，拖進 `rejects/` 就是表態，一個字都不用打 |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | 一份 append-only 日誌，每條開頭一行固定格式索引行，內容只指路不複製；另在專案「每次都會載入的那份檔案」裝一行指標，下一顆代理不用人講就會自己去讀 |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 每條驗收都用證據回答、人給的診斷歸給人、背景任務關掉要有憑據、聊天訊息從報告裡原文複製出來 |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | 重現 → 最小化 → 假設 → 打點 → 修復 → 回歸，每一階段產出的東西就是下一階段要用的材料 |
-| [`ask-harness`](addons/router/skills/ask-harness/SKILL.md) | 地圖：主幹迴圈、幾條 on-ramp、以及眼前這個處境該用哪顆。入口不明顯時它會自己觸發 |
 
 每顆 skill 都帶著自己的規則、步驟、一條可核對的完成判準
 核心四顆另附一份 `CASES.md`——記錄「哪一次翻車換來這條規則」，已通用化

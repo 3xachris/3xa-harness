@@ -18,6 +18,6 @@ A contact sheet answers *which one should I look at*. It cannot answer *is this 
 
 ## 3. The closed gate still held its rejects
 
-A task was reported complete while the `NG/` folder from an early round still held the files the human had rejected. Weeks later a batch job walked the whole review tree and pulled the rejected takes back into a build, because on disk they were simply files sitting in the project.
+A task was reported complete while the `rejects/` folder from an early round still held the files the human had rejected. Weeks later a batch job walked the whole review tree and pulled the rejected takes back into a build, because on disk they were simply files sitting in the project.
 
-**Rule:** emptying `NG/` is part of closing out. A rejection recorded only as a file's location stops being a rejection the moment something else reads that folder.
+**Rule:** emptying `rejects/` is part of closing out. A rejection recorded only as a file's location stops being a rejection the moment something else reads that folder.
