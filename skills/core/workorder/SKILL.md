@@ -27,6 +27,8 @@ Seven fields, plus the header line that freezes it.
 
 ## 2. Run the order
 
+For mechanical cross-checking, give every acceptance line a stable ID such as `AC-1` and keep that ID in the closeout answer. The verifier reads lines shaped like `- [ ] AC-1: ...`.
+
 1. **Check the order against the disk first**, and open the project's decision log while you are there — it holds what was settled before this order existed. Paths, filenames, service states, versions: confirm each assumption the order rests on before the first edit. Messages from here on open with `WORKING`. Treat the disk as the factual authority: when it disagrees with the order, stop, name the conflict, and ask before deciding how to proceed.
 2. **Build the whole scope**, keeping the budget count in the artifacts folder as you spend it — one line per unit spent, written when it is spent. Every acceptance line is a deliverable; a line that turns out to be blocked is reported as blocked, with the rest finished in full.
 3. **Self-verify**, walking the acceptance list line by line and attaching the evidence each line named. Apply the `honest-closeout` `DONE` condition before treating the order as ready for that status.

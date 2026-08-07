@@ -30,6 +30,8 @@ This is where the pack's reporting conventions are defined; other skills point h
 
 ## 2. Write the report
 
+For mechanical cross-checking, answer each frozen acceptance ID (`AC-1`, `AC-2`, and so on) on a line shaped like `- [PASS] AC-1: ... | evidence: path`. Record an independent functional check on a line shaped like `- Functional verification: what was run | evidence: path`. List each gate as `- [GATE] gate/path | disposition: approved | reviewer: name | archive: none` or with its archive path.
+
 The report is a file on disk. The chat message is a copy of part of it, never a separate composition.
 
 1. **Answer the acceptance list line by line**, reading it as amended — where the order carries amendment blocks, the amended text is the one being answered. Each line gets PASS or FAIL and the evidence it named — path, output, measurement. A line nobody can evidence is FAIL with the reason, which is information; a line summarised instead of answered is a gap.

@@ -56,6 +56,18 @@ npx skills@latest add 3xachris/3xa-harness
 
 ## What's inside
 
+## Executable closeout check
+
+The pack includes [`verify_closeout.py`](verify_closeout.py), a standalone Python 3 script because Python is commonly present on developer and CI machines and its standard library keeps this check dependency-free. Run it with one frozen order, one closeout report, and the decision log:
+
+```bash
+python verify_closeout.py artifacts/order.md artifacts/closeout.md docs/decisions.md --root .
+```
+
+It checks that acceptance IDs are answered one by one, evidence paths exist, `DONE` has an independent functional verification, every opened gate has a named disposition and archive path when needed, and the decision log points to this report. Findings are candidate warnings for a human; they are not an automatic content verdict. A legacy report without the structured fields prints `Unable to verify, skipped` and exits differently from a completed check. The final line always states: this script checks form only; whether the content is correct is for a human.
+
+Claude Code hook binding is optional project wiring; the script itself is intended to be run by a person or CI.
+
 | Skill | One-line usage |
 |---|---|
 | [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass; `DONE` also needs independent functional verification outside the work's control. Resistant failures use the core diagnosis loop, with `staged-diagnosis` as its optional expanded version. |

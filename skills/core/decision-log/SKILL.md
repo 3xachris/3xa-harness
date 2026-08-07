@@ -50,6 +50,15 @@ The log holds when all four are true, checked over the whole file after appendin
 
 ## Entry shape
 
+For a sensory gate, make the opening and its later human disposition machine-readable in the entry body:
+
+```markdown
+> Gate: review/batch-01 | Batch: batch-01 | Files: render.png=sha256
+> Gate disposition: review/batch-01 | Reviewer: Ada | Scope: all files in batch | Archive: none
+```
+
+The opening line is written before review and the disposition line after the human answer. A rejected batch uses the existing `rejected-archive/<gate-folder>/` path in `Archive`.
+
 ```markdown
 ## 2026-08-06 Dropped the write-through cache, kept the staleness problem
 

@@ -29,6 +29,8 @@ The status words this message uses — `GATE-HOLD` to open the gate, `WAITING_FO
 
 ## 2. Run the gate
 
+Write the gate register with `> Gate: <gate-folder> | Batch: <batch-id> | Files: <relative-path=sha256, ...>` before review. After the human answer, append `> Gate disposition: <gate-folder> | Reviewer: <name> | Scope: <all files in batch|approved file list> | Archive: <path|none>`.
+
 1. Produce the **whole batch** for this round before asking — one round of attention, spent once.
 2. Create the gate folder with `rejects/` already inside it, inside this task's artifacts folder. Before sending the review message, append the gate-opening `decision` entry described above and verify that its file list and SHA-256 hashes describe the files on disk.
 3. Send one message: `GATE-HOLD`, the runnable open command and the plain path, the plain-language question, a request for the reviewer's name or handle plus approval of the whole batch or named files, and the wait token on its own last line.
