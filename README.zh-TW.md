@@ -144,7 +144,9 @@ python verify_closeout.py .verification-demo/order.md .verification-demo/closeou
 
 應以 exit code `0` 成功解析; 最後的誠實邊界仍表示內容是否正確由人判斷
 
-## 四個核心 skill
+## 每顆 skill 一句話
+
+核心（`harness-core`）:
 
 | Skill | 用途 |
 |---|---|
@@ -152,6 +154,11 @@ python verify_closeout.py .verification-demo/order.md .verification-demo/closeou
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 把圖片、音訊或影片集中到 gate 資料夾, 由人記錄 reviewer、批次和核准範圍 |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | 讓決策、拒絕、修正和收尾跨過 context reset, 並由每次載入的專案檔指向它 |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 逐條回答驗收, 把功能驗證與 hash、環境 identity 分開, 並保留人員修正和背景程序狀態 |
+
+加裝（`harness-debug`, 選裝）:
+
+| Skill | 用途 |
+|---|---|
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | 將難解錯誤拆成 reproduce、minimise、hypothesise、instrument、fix、regression-test 六段 |
 
 `DONE` 的獨立功能驗證不等於 hash 或環境 identity. hash 說明檢查的是哪些 bytes, environment 說明在哪裡執行; 它們不證明功能真的正確
