@@ -17,9 +17,59 @@ MIN_PYTHON = (3, 9)  # Path.is_relative_to (used below) needs 3.9+
 
 ACCEPTANCE_RE = re.compile(r"^- \[ \] (AC-\d+):", re.MULTILINE)
 ANSWER_RE = re.compile(r"^- \[(?:PASS|FAIL|BLOCKED)\] (AC-\d+):.*\| evidence:\s*(\S+)", re.MULTILINE)
+
+# Legacy decision-log format (pre-2026-08-07): a prose blockquote index line under each
+# heading. Kept forever, never removed -- the log is append-only, so old entries stay
+# exactly as written (decision-log SKILL.md, section "Older logs keep working").
 GATE_OPEN_RE = re.compile(r"^> Gate: (\S+) \| Batch: (\S+) \| Files: (.+)$", re.MULTILINE)
 GATE_DISPOSITION_RE = re.compile(r"^> Gate disposition: (\S+) \| Reviewer: (\S+) \| Scope: (.+?) \| Archive: (\S+)$", re.MULTILINE)
 CLOSEOUT_RE = re.compile(r"^> Type: closeout \| Target: (\S+)$", re.MULTILINE)
+
+# Current decision-log format: a fenced ```yaml``` block under each heading (not literal
+# file-top frontmatter -- see decision-log SKILL.md section 1 for why). Parsed with a
+# minimal flat key:value reader, not a YAML library, to keep this script dependency-free.
+YAML_BLOCK_RE = re.compile(r"^```yaml\r?\n(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
+
+
+def parse_yaml_block(block: str) -> dict:
+    """Read a flat key: value block -- scalars, quoted strings, and [a, b] inline lists.
+    Deliberately not a full YAML parser: the schema (decision-log SKILL.md section 5)
+    never nests, so this covers it without adding a dependency."""
+    fields = {}
+    for line in block.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or ":" not in line:
+            continue
+        key, _, value = line.partition(":")
+        key = key.strip()
+        value = value.strip()
+        if value.startswith("[") and value.endswith("]"):
+            inner = value[1:-1].strip()
+            value = [item.strip().strip('"').strip("'") for item in inner.split(",") if item.strip()]
+        elif len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        fields[key] = value
+    return fields
+
+
+def parse_decision_log(text: str):
+    """Return (opened gate ids, {disposition id: (reviewer, scope, archive)}, [closeout
+    source paths]) by reading both the legacy blockquote format and the current fenced
+    yaml format, so an entry written under either convention is accounted for."""
+    opened = {match.group(1) for match in GATE_OPEN_RE.finditer(text)}
+    dispositions = {match.group(1): match.groups()[1:] for match in GATE_DISPOSITION_RE.finditer(text)}
+    closeout_targets = [match.group(1) for match in CLOSEOUT_RE.finditer(text)]
+
+    for match in YAML_BLOCK_RE.finditer(text):
+        fields = parse_yaml_block(match.group(1))
+        if {"gate", "batch", "files"} <= fields.keys():
+            opened.add(fields["gate"])
+        if {"disposition", "reviewer", "scope", "archive"} <= fields.keys():
+            dispositions[fields["disposition"]] = (fields["reviewer"], fields["scope"], fields["archive"])
+        if fields.get("type") == "closeout" and fields.get("source"):
+            closeout_targets.append(fields["source"])
+
+    return opened, dispositions, closeout_targets
 
 BOUNDARY = "\u9019\u652f\u53ea\u9a57\u5f62\u5f0f\uff0c\u5167\u5bb9\u5c0d\u4e0d\u5c0d\u662f\u4eba\u7684\u4e8b"
 RUNTIME_FALLBACK = ("\u74b0\u5883\u4e0d\u53ef\u7528\uff0c\u8acb\u6539\u8d70\u624b\u52d5\u6838\u5c0d"
@@ -110,8 +160,7 @@ def main() -> int:
         functional_label += f"; missing evidence: {', '.join(absent_functional)}"
     print(f"[3/5] independent functional verification for DONE: {functional_label}")
 
-    opened = {match.group(1) for match in GATE_OPEN_RE.finditer(texts["decision log"])}
-    dispositions = {match.group(1): match.groups()[1:] for match in GATE_DISPOSITION_RE.finditer(texts["decision log"])}
+    opened, dispositions, closeout_targets = parse_decision_log(texts["decision log"])
     listed = {match.group(1): match.groups()[1:] for match in re.finditer(r"^- \[GATE\] (\S+) \| disposition: (\S+) \| reviewer: (\S+) \| archive: (\S+)$", texts["report"], re.MULTILINE)}
     gate_warnings = []
     for gate in opened:
@@ -130,7 +179,6 @@ def main() -> int:
 
     report_path = paths["report"]
     report_target = report_path.relative_to(root).as_posix() if report_path.is_relative_to(root) else report_path.as_posix()
-    closeout_targets = [match.group(1) for match in CLOSEOUT_RE.finditer(texts["decision log"])]
     log_label = "[OK] closeout entry points to report" if report_target in closeout_targets or report_path.as_posix() in closeout_targets else "[WARN] no matching closeout entry"
     print(f"[5/5] decision log pointer: {log_label}")
     print(BOUNDARY)

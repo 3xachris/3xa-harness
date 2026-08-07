@@ -45,6 +45,15 @@ If a "light" task turns out bigger than it looked — three files in, still find
 
 Two plugins in one marketplace — take the core, add what you need.
 
+Inside a Claude Code conversation:
+
+```
+/plugin marketplace add 3xachris/3xa-harness
+/plugin install harness-core@3xa-harness
+```
+
+Or from a terminal, same result:
+
 ```bash
 claude plugin marketplace add https://github.com/3xachris/3xa-harness
 claude plugin install harness-core@3xa-harness
@@ -60,6 +69,14 @@ Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\handof
 ```
 
 The final command should list five `SKILL.md` files. Start a new Codex session and describe a matching task to confirm the skill is discovered and invoked.
+
+OpenCode users clone the whole repo into the OpenCode skills directory — not just the inner `skills/` folder, the full repo, so the path comes out `~/.opencode/skills/3xa-harness/skills/core/<skill-name>/SKILL.md`:
+
+```sh
+git clone https://github.com/3xachris/3xa-harness.git ~/.opencode/skills/3xa-harness
+```
+
+OpenCode auto-discovers every `SKILL.md` under `~/.opencode/skills/`; no config file changes needed. Restart OpenCode for it to pick the skills up.
 
 | Plugin | What it adds |
 |---|---|
@@ -78,7 +95,9 @@ Then describe the task normally — "freeze this before we start", "review this 
 npx skills@latest add 3xachris/3xa-harness
 ```
 
-**Pick one route: Claude plugin, Codex user skills, or skills.sh.** Each route installs the same skills; choosing more than one leaves every skill twice.
+*Unverified in this environment* — the sandbox this README was written in blocks outbound `npm`/`node` traffic at the network layer, so this exact command has not been run end to end here; it follows the form `skills.sh` documents for adding a GitHub repo by `owner/repo`. If it fails for you the way it did here, the error is `npm error code EACCES` / `FetchError ... registry.npmjs.org`, and it means your network, not this repo — the Claude plugin and Codex routes above don't go through npm at all.
+
+**Pick one route: Claude plugin, Codex user skills, OpenCode, or skills.sh.** Each route installs the same skills; choosing more than one leaves every skill twice.
 
 ## Executable closeout check
 
@@ -95,8 +114,8 @@ If that command fails, or reports a version below 3.9, don't build the artifacts
 1. Every `AC-n` in the order has a matching `- [PASS/FAIL/BLOCKED] AC-n` line in the closeout.
 2. Every path after `| evidence:` opens.
 3. If the closeout's status is `DONE`, a `- Functional verification: ... | evidence: ...` line exists, its evidence path opens, and its description is more than a hash or environment claim.
-4. Every `> Gate: ...` line in the decision log has a matching `> Gate disposition: ...` line; the closeout's `[GATE]` line agrees with that disposition's reviewer and archive; and a non-`none` archive path opens.
-5. The decision log has a `> Type: closeout | Target: <path to this report>` line.
+4. Every gate opening in the decision log — a fenced `yaml` block with a `gate` key, or the legacy `> Gate: ...` line — has a matching disposition (a `disposition` key, or the legacy `> Gate disposition: ...` line); the closeout's `[GATE]` line agrees with that disposition's reviewer and archive; and a non-`none` archive path opens.
+5. The decision log has a closeout entry pointing at this report — `type: closeout` with `source: <path to this report>` in the new format, or `> Type: closeout | Target: <path to this report>` in the legacy one.
 
 Running the script catches slips in this by hand faster; it does not replace judging whether the content is right, on a runtime or off one.
 
@@ -151,6 +170,12 @@ Put the order, gate folders, evidence, and closeout under one artifacts folder. 
 ```bash
 python verify_closeout.py artifacts/checkout-20260807/order.md artifacts/checkout-20260807/closeout.md docs/decisions.md --root .
 ```
+
+## Works well with Obsidian — recommended, not required
+
+`decision-log` and `handoff` are plain Markdown: a YAML block under each entry, and `[[path/from/root/file.md#Heading]]` WikiLinks between entries. Nothing here needs an app — an agent reads the files directly, and a human reads the same text cold, with or without a renderer. Opening the same folder as an Obsidian vault adds two things that are otherwise hand-maintained: renaming a file updates every `[[...]]` that pointed at it, and the backlinks panel shows which entries reference a given one. Both are read-only conveniences on files this pack already writes — no Obsidian-specific syntax (no Dataview queries, no Templater scripts) ever appears in them, so nothing breaks if you don't install it.
+
+Recommended because it's a large existing user base your team may already be on, not because any skill here depends on it. Every skill, and `verify_closeout.py`, behave identically with or without Obsidian in the loop. Commercial/team use of Obsidian carries its own licensing terms, separate from this repo's MIT license — check [obsidian.md/pricing](https://obsidian.md/pricing) before adopting it for a team; any plain-text or Markdown editor reads these files just as well if that doesn't fit.
 
 ## Integration templates
 

@@ -20,11 +20,11 @@ Four categories, each answered or marked `none` — leaving one out reads identi
 
 The most common way a handoff fails: written as a log of what got done this session, in the order it happened. A narrative like that has no edge that stops it short of complete — it just stops wherever the writer's memory of the session runs out, and what's missing is exactly the part the writer wasn't touching when they sat down to write: someone else's open thread, an asset from three sessions back, a debt nobody's mentioned lately. Write against the four categories instead, and write each fact as itself rather than as something someone did — a fact stated plainly reads the same whether the cold reader arrives in an hour or in a month.
 
-Don't restate what another artifact already carries. A `decision-log` entry, a frozen order, a report — point at its path. A handoff that copies one becomes a second copy that goes stale the moment the original changes, and the reader can no longer tell which one to trust. Copy nothing that already has an authoritative home.
+Don't restate what another artifact already carries. A `decision-log` entry, a frozen order, a report — point at its path, using the same WikiLink form `decision-log` uses (`[[path/from/root/file.md]]`, `#Heading` appended for a specific entry) so a pointer in either document is followed the same way. A handoff that copies one becomes a second copy that goes stale the moment the original changes, and the reader can no longer tell which one to trust. Copy nothing that already has an authoritative home.
 
 ## 3. Leave the pointer
 
-After writing, append one `decision` entry to the project's decision log with the handoff document's path as its Target — the existing pointer mechanism, not a new one. A session that opens the log first, as `workorder` already tells it to, finds the handoff from there too. Run the `decision-log` skill for the entry format.
+After writing, append one `decision` entry to the project's decision log with the handoff document's path as its `source` key — the existing pointer mechanism, not a new one. A session that opens the log first, as `workorder` already tells it to, finds the handoff from there too. Run the `decision-log` skill for the entry format.
 
 ## 4. Completion criteria
 
@@ -32,7 +32,7 @@ After writing, append one `decision` entry to the project's decision log with th
 - No sentence names "this session," "I," "we," or a person by role — a leftover of narrative structure the checklist alone won't catch, so read for it specifically.
 - Every fact that already lives in a decision-log entry, a frozen order, or a report appears here only as a path, not restated.
 - Every open thread's status word is one of the fixed five, each with its one-line reason.
-- The decision log carries an entry whose Target is this document.
+- The decision log carries an entry whose `source` is this document.
 - **The test the first five don't cover:** hand the document, alone, to someone who was not here, and have them state the single next action for one open thread using nothing else. If they can't, the checklist entry that thread lived under was answered too thinly, not left off — a self-read by the writer doesn't catch this, the same way a self-run test doesn't prove `honest-closeout`'s `DONE`.
 
 ## Handoff template
@@ -44,7 +44,7 @@ After writing, append one `decision` entry to the project's decision log with th
 
 ## Running work
 
-- <thread> — <status word> — <one-line reason>. Order: <path, or "none">
+- <thread> — <status word> — <one-line reason>. Order: <[[path]], or "none">
 - (none)
 
 ## Already-spent assets
@@ -64,8 +64,8 @@ After writing, append one `decision` entry to the project's decision log with th
 
 ## Pointers, not copies
 
-- Decision log: <path>
-- Orders / reports referenced above: <paths already listed inline, not repeated here>
+- Decision log: [[<path>]]
+- Orders / reports referenced above: <WikiLinks already listed inline, not repeated here>
 ```
 
 ## Judgment cases

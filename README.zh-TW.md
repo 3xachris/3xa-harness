@@ -31,6 +31,15 @@
 
 ## 安裝
 
+Claude Code 對話裡直接打:
+
+```
+/plugin marketplace add 3xachris/3xa-harness
+/plugin install harness-core@3xa-harness
+```
+
+或改用終端機, 結果一樣:
+
 ```bash
 claude plugin marketplace add https://github.com/3xachris/3xa-harness
 claude plugin install harness-core@3xa-harness
@@ -51,13 +60,23 @@ Copy-Item skills\core\workorder,skills\core\sensory-gate,skills\core\decision-lo
 Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\handoff,$dest\honest-closeout -Filter SKILL.md
 ```
 
+OpenCode 使用者要 clone 整個 repo 進 OpenCode 的 skill 目錄, 不是只複製裡面的 `skills/` 資料夾, 要留完整 repo 結構, 路徑會長成 `~/.opencode/skills/3xa-harness/skills/core/<skill-name>/SKILL.md`:
+
+```sh
+git clone https://github.com/3xachris/3xa-harness.git ~/.opencode/skills/3xa-harness
+```
+
+OpenCode 會自動找出 `~/.opencode/skills/` 底下每個 `SKILL.md`, 不用改任何設定檔, 重啟 OpenCode 後生效
+
 其他 agent 可用 [skills.sh](https://skills.sh):
 
 ```bash
 npx skills@latest add 3xachris/3xa-harness
 ```
 
-選 Claude plugin, Codex user skills 或 skills.sh 其中一條路即可. 選多條會讓每個 skill 被安裝兩次
+*本環境未驗證* — 寫這份 README 的沙盒環境在網路層擋掉 npm/node 對外連線, 這行指令沒能在本地實跑過, 寫法照 skills.sh 文件對「用 owner/repo 加 GitHub repo」的既有形狀寫; 若你那邊也失敗, 錯誤會長這樣: `npm error code EACCES` / `FetchError ... registry.npmjs.org`, 那是你的網路環境問題, 不是這個 repo 的問題 — 上面 Claude plugin 與 Codex 兩條路徑都不經過 npm
+
+選 Claude plugin, Codex user skills, OpenCode 或 skills.sh 其中一條路即可, 選多條會讓每個 skill 被安裝兩次
 
 ## 可執行的收尾驗證
 
@@ -74,8 +93,8 @@ python --version
 1. order 裡每個 `AC-n`, 收尾裡都有對應的 `- [PASS/FAIL/BLOCKED] AC-n` 那行
 2. `| evidence:` 後面每個路徑都打得開
 3. 收尾狀態若是 `DONE`, 要有一行 `- Functional verification: ... | evidence: ...`, 證據路徑打得開, 而且描述不只是 hash 或環境宣稱
-4. 決策日誌裡每個 `> Gate: ...` 都有對應的 `> Gate disposition: ...`; 收尾的 `[GATE]` 那行與該 disposition 的 reviewer、archive 一致; archive 不是 `none` 時該路徑打得開
-5. 決策日誌裡有一行 `> Type: closeout | Target: <指向本報告的路徑>`
+4. 決策日誌裡每個 gate 開啟紀錄 — 帶 `gate` 欄位的 `yaml` 區塊, 或舊式 `> Gate: ...` 那行 — 都有對應的 disposition (`disposition` 欄位, 或舊式 `> Gate disposition: ...` 那行); 收尾的 `[GATE]` 那行與該 disposition 的 reviewer、archive 一致; archive 不是 `none` 時該路徑打得開
+5. 決策日誌裡有一筆指向本報告的收尾條目 — 新格式是 `type: closeout` 配 `source: <指向本報告的路徑>`, 舊格式是 `> Type: closeout | Target: <指向本報告的路徑>`
 
 跑腳本能更快抓出手動核對時的疏漏; 它不能取代判斷內容對不對 — 不管有沒有 runtime 都一樣
 
@@ -115,6 +134,12 @@ your-project/
 ```bash
 python verify_closeout.py artifacts/checkout-20260807/order.md artifacts/checkout-20260807/closeout.md docs/decisions.md --root .
 ```
+
+## 搭配 Obsidian 更好用 — 推薦但非必要
+
+`decision-log` 與 `handoff` 都是純 Markdown: 每個條目底下一個 YAML 區塊, 條目之間用 `[[path/from/root/file.md#標題]]` 這種 WikiLink 互指, 這裡沒有任何東西需要裝 app 才能讀 — agent 直接讀檔案, 人不裝任何渲染器也照樣冷讀得懂同一份文字, 把同一個資料夾當 Obsidian vault 打開, 多兩件事本來要手動維護: 改檔名時所有指向它的 `[[...]]` 會跟著更新, 反向連結面板能看到哪些條目引用了這一條, 這兩件事都只是讀取這包本來就會寫的檔案, 不改變磁碟上的任何內容 — 也沒有用到任何 Obsidian 專屬語法 (沒有 Dataview 查詢碼, 沒有 Templater 腳本), 不裝 Obsidian 什麼都不會壞
+
+推薦是因為你的團隊可能已經在用, 使用者基數大, 不是因為這裡任何一個 skill 依賴它, 每個 skill 與 `verify_closeout.py` 有沒有 Obsidian 在場行為完全一樣, Obsidian 本身的商業/團隊授權條款是它自己的事, 與這個 repo 的 MIT 授權分開 — 要用在團隊上前先查 [obsidian.md/pricing](https://obsidian.md/pricing) 目前的條款, 不合適的話任何純文字或 Markdown 編輯器都能一樣讀這些檔案
 
 ## 整合範本
 
