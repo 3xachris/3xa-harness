@@ -58,10 +58,10 @@ npx skills@latest add 3xachris/3xa-harness
 
 | Skill | One-line usage |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass; resistant failures use the core diagnosis loop, with `staged-diagnosis` as its optional expanded version. |
-| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with a `rejects/` subfolder; the agent holds there, and you reject by dragging a file into `rejects/`. Nothing to write. |
+| [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass; `DONE` also needs verification outside the work's control. Resistant failures use the core diagnosis loop, with `staged-diagnosis` as its optional expanded version. |
+| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with a `rejects/` subfolder; record the batch's file hashes in the decision log before review, and move rejected files to the reference-only `rejected-archive/<gate-folder>/`. |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | One log with append-only entries and a maintained top summary, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session. |
-| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |
+| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, `DONE` backed by verification outside the work's control, gate folders and hashes reconciled from the decision log, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Reproduce → minimise → hypothesise → instrument → fix → regression-test, each stage producing what the next one runs on. |
 
 Each skill carries its rules, its steps, and a completion criterion you can check. The four core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.

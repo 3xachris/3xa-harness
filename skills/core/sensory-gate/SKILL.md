@@ -16,6 +16,7 @@ description: Hand images, audio, video, or any artifact only a human eye or ear 
   | 4 or more | The gate folder's absolute path, alone |
   | 3 or fewer | Each file's own absolute path, listed |
 - **`rejects/` subfolder** — created inside the gate folder *before* the human is asked. Dragging a file into `rejects/` **is** the rejection; no comment, no form, no reply needed. Read the folder's real contents on disk to learn the verdict — the disk is where the human answered.
+- **Gate identity** — when the gate folder is created and before the review message is sent, append one `decision` entry to the project's decision log with the gate folder as its Target and a file list containing each review file's relative path and SHA-256 hash. That entry is the gate register and binds the human-reviewed batch to the later shipped batch.
 - **Approval needs an answer, not just an empty `rejects/`.** An empty folder means "nothing rejected" only once the human has replied; before that it means "not looked at yet", and the two are indistinguishable from disk alone. So the gate opens on the reply and reads the folder second. When the reply names rejects in words instead of moving files — *"the third one is wrong"* — that is a rejection: move those files into `rejects/` yourself, say which ones you moved, and carry on from the same state the drag would have produced.
 - **One-click open.** Where the chat client renders a run button on shell code blocks, hand over a runnable command — `explorer "<path>"` on Windows, `open "<path>"` on macOS, `xdg-open "<path>"` on Linux — alongside the plain path, which works everywhere. For a small batch, `explorer /select,"<file>"` opens the folder with that file already highlighted.
 - **Commands are built from your own paths.** Everything inside a command handed to a human is a path this task constructed. Text from a webpage, a document, or any file of unknown origin goes in the message body, where running it is not one click away.
@@ -29,16 +30,16 @@ The status words this message uses — `GATE-HOLD` to open the gate, `WAITING_FO
 ## 2. Run the gate
 
 1. Produce the **whole batch** for this round before asking — one round of attention, spent once.
-2. Create the gate folder with `rejects/` already inside it, inside this task's artifacts folder — that is what makes "every gate folder this task opened" something the closeout can list rather than remember.
+2. Create the gate folder with `rejects/` already inside it, inside this task's artifacts folder. Before sending the review message, append the gate-opening `decision` entry described above and verify that its file list and SHA-256 hashes describe the files on disk.
 3. Send one message: `GATE-HOLD`, the runnable open command and the plain path, the plain-language question, and the wait token on its own last line.
 4. **Hold.** The next thing this task does is read the human's answer. One request, sent once, is the whole ask.
 5. When they answer, read the gate folder from disk. Files inside `rejects/` are rejected, full stop — that action was the verdict and it needs no confirming question. Rejects named in words get moved into `rejects/` by you, so the folder and the verdict agree.
-6. **Record the verdict where it survives the folder.** Each rejected item gets one `rejection` entry in the project's decision log — what was turned down, the reason if one was given, and the gate folder as its Target. A verdict that exists only as a file's location stops existing the moment the folder is cleaned, and the human's judgment is the most expensive thing in this whole loop to have to ask for twice. Run the `decision-log` skill for the entry format.
-7. Rework the rejects into the next round; approved items move on. At final closeout, empty `rejects/` yourself, so nothing already rejected can resurface in a later batch.
+6. **Record the verdict where it survives the folder.** Each rejected item gets one `rejection` entry in the project's decision log — what was turned down, the reason if one was given, and the gate folder as its Target. Then move the rejected item to the task artifacts folder's `rejected-archive/<gate-folder>/`; that archive is reference-only, and later production batches use newly produced files rather than archived inputs. Run the `decision-log` skill for the entry format.
+7. Rework the rejected requirement into newly produced files for the next round; approved items move on. The original rejected files remain in the reference-only archive.
 
 ## 3. Completion criteria
 
-Before sending, **open the gate folder yourself** — the folder, not your memory of writing to it — and check four things: the path in the message resolves; `rejects/` exists and is empty; the file count in the folder equals the count the message claims; and every noun in the question names something visible in the artifact itself or present in the original request.
+Before sending, **open the gate folder yourself** — the folder, not your memory of writing to it — and check five things: the path in the message resolves; `rejects/` exists and is empty; the file count in the folder equals the count the message claims; the gate-opening decision entry records the same files and SHA-256 hashes; and every noun in the question names something visible in the artifact itself or present in the original request.
 
 ## Gate message
 

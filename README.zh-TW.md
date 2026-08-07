@@ -72,10 +72,10 @@ npx skills@latest add 3xachris/3xa-harness
 
 | skill | 一句話用法 |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、素材與其授權、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到 `DONE`、`CLOSED-FAILED` 或 `STOPPED`；遇到難查的失敗就用核心診斷迴圈，選配的 `staged-diagnosis` 是它的加強版 |
-| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `rejects/` 子夾），代理停在那裡等你；你不滿意哪個，拖進 `rejects/` 就是表態，一個字都不用打 |
+| [`workorder`](skills/core/workorder/SKILL.md) | 先把任務凍結——一句話、已知事實、素材與其授權、釘死的參數、預算熔斷、驗收條件、非目標——然後一口氣跑到 `DONE`、`CLOSED-FAILED` 或 `STOPPED`；`DONE` 還要有不受本次工作控制的驗證，遇到難查的失敗就用核心診斷迴圈，選配的 `staged-diagnosis` 是它的加強版 |
+| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 圖／音／影整批丟進一個 gate 資料夾（內含 `rejects/` 子夾），送審前把檔案雜湊記進決策日誌；被拒絕的檔案移到只供追溯的 `rejected-archive/<gate-folder>/` |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | 一份條目 append-only、頂端摘要可維護的日誌，每條開頭一行固定格式索引行，內容只指路不複製；另在專案「每次都會載入的那份檔案」裝一行指標 |
-| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 每條驗收都用證據回答、人給的診斷歸給人、背景任務關掉要有憑據、聊天訊息從報告裡原文複製出來 |
+| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 每條驗收都用證據回答，`DONE` 要有不受本次工作控制的驗證，從決策日誌逐一核對 gate 與雜湊，人給的診斷歸給人、背景任務關掉要有憑據、聊天訊息從報告裡原文複製出來 |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | 重現 → 最小化 → 假設 → 打點 → 修復 → 回歸，每一階段產出的東西就是下一階段要用的材料 |
 
 每顆 skill 都帶著自己的規則、步驟、一條可核對的完成判準

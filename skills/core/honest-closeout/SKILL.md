@@ -20,10 +20,10 @@ This is where the pack's reporting conventions are defined; other skills point h
   | `WORKING` | running; nothing needed from you |
   | `GATE-HOLD` | stopped at a review gate, waiting on your judgment |
   | `STOPPED` | stopped short — the two-strike rule handed the next move back to you |
-  | `DONE` | every acceptance line passed with evidence |
+  | `DONE` | every acceptance line passed with evidence and the report records verification outside the work's control |
   | `CLOSED-FAILED` | every acceptance line has evidence or a recorded blocking reason, but the target was not achieved |
 
-  Choose from these five. Use `DONE` when every acceptance line passed, `CLOSED-FAILED` when the trail is complete but the target was not achieved, and `STOPPED` when the two-strike rule ends the run. A state that fits none of them is `STOPPED`, with the reason on the next line.
+  Choose from these five. Use `DONE` when every acceptance line passed and the report records at least one verification outside the work's control: a clean-environment rerun, an artifact hash, an environment-and-commit identity, or a post-deployment smoke test. When none applies, record why this task does not need one. Use `CLOSED-FAILED` when the trail is complete but the target was not achieved, and `STOPPED` when the two-strike rule ends the run. A state that fits none of them is `STOPPED`, with the reason on the next line.
 - **The wait token.** A message that needs the human to act ends with one fixed token alone on the final line — `WAITING_FOR_HUMAN`. It is reserved for exactly that case, which is what keeps it meaning something when it appears.
 - **Codes for state, sentences for claims.** The status word and the wait token compress *state* — what this task is doing right now — and compression suits state, because it has a fixed set of values and gets read on every message. A **claim about the world** is the opposite case: this dependency is unmaintained, that bug is fixed, the upstream project has a design flaw. Claims go in full sentences in the report body, however long the sentence needs to be. Compressed into a field — `severity: high`, `A1: read-side absent` — a claim loses the one property a reviewer reads it for: how much it is asserting. A reader can tell that *"the upstream project has a structural hole"* deserves a second look before anyone acts on it; nobody can tell that from a severity value. The audacity of a claim lives in its wording, and the wording is exactly what a code throws away.
 - **`[UNVERIFIED]` marks the unchecked.** Version numbers, licence terms, quota limits, "this is fixed" — anything not confirmed at its source this session carries the tag inline, so a reviewer can tell a checked statement from a confident one.
@@ -33,14 +33,16 @@ This is where the pack's reporting conventions are defined; other skills point h
 The report is a file on disk. The chat message is a copy of part of it, never a separate composition.
 
 1. **Answer the acceptance list line by line**, reading it as amended — where the order carries amendment blocks, the amended text is the one being answered. Each line gets PASS or FAIL and the evidence it named — path, output, measurement. A line nobody can evidence is FAIL with the reason, which is information; a line summarised instead of answered is a gap.
-2. **Answer the frozen order's other two claims**: that the work used only the materials the order allowed, and that it stayed out of the non-goals. Both are one line each, and both are the fields a reviewer would otherwise have to reconstruct from the diff.
-3. **Record what people did**, compiled from the log entries written at the time rather than from what the session remembers. Every human stop, correction, or diagnosis appears with the person who supplied it, including permissions granted mid-build (a dependency installed, a setting changed) — the reviewer is deciding about a system whose state changed, and needs to know it did. Where a `decision-log` is running, its `correction` entries are the source this section is built from.
-4. **Keep the refuted hypotheses.** What was tried and eliminated is the most reusable part of the report; the next attempt spends its budget on new ground instead of re-walking this one.
-5. **Report the budget spent** against the fuse the order set — the count, the unit, and whether the fuse was reached. A build that stopped on its fuse and a build that finished are different results, and only this line tells them apart.
-6. **Prove the background is clear.** Query the tooling for every background process this session started and account for each one. Anything meant to outlive the report is declared with a receipt a later session can check by itself: an absolute output path, a PID, or a log file's absolute path. A name only this session knows is not a receipt.
-7. **Write the chat-summary section inside the report** — status word, the three-to-five line result, the paths a human needs to open, the wait token if action is needed.
-8. **Send that section verbatim.** Copy it out of the file; a summary rewritten from memory late in a long session drifts, and drift runs toward the flattering version.
-9. **Leave the log a pointer.** One `closeout` entry — the result in a line, the report's path as its Target — so the next session finds this report by reading the log rather than by knowing it exists. Run the `decision-log` skill for the entry format.
+2. **Prove the `DONE` condition** by recording at least one verification outside the work's control, naming the clean environment and rerun output, the artifact hash, the environment-and-commit identity, or the deployment smoke-test result. If none applies, record why this task does not need one. A self-run command or a mutable local test is not that proof.
+3. **Answer the frozen order's other two claims**: that the work used only the materials the order allowed, and that it stayed out of the non-goals. Both are one line each, and both are the fields a reviewer would otherwise have to reconstruct from the diff.
+4. **Record what people did**, compiled from the log entries written at the time rather than from what the session remembers. Every human stop, correction, or diagnosis appears with the person who supplied it, including permissions granted mid-build (a dependency installed, a setting changed) — the reviewer is deciding about a system whose state changed, and needs to know it did. Where a `decision-log` is running, its `correction` entries are the source this section is built from.
+5. **Keep the refuted hypotheses.** What was tried and eliminated is the most reusable part of the report; the next attempt spends its budget on new ground instead of re-walking this one.
+6. **Report the budget spent** against the fuse the order set — the count, the unit, and whether the fuse was reached. A build that stopped on its fuse and a build that finished are different results, and only this line tells them apart.
+7. **Prove the background is clear.** Query the tooling for every background process this session started and account for each one. Anything meant to outlive the report is declared with a receipt a later session can check by itself: an absolute output path, a PID, or a log file's absolute path. A name only this session knows is not a receipt.
+8. **Answer the gate register** from the gate-opening `decision` entries in the project's decision log. List every recorded gate folder, compare its recorded file hashes with the files shipped, and report the `rejected-archive/<gate-folder>/` path and its contents. This is the complete gate list for the task.
+9. **Write the chat-summary section inside the report** — status word, the three-to-five line result, the paths a human needs to open, the wait token if action is needed.
+10. **Send that section verbatim.** Copy it out of the file; a summary rewritten from memory late in a long session drifts, and drift runs toward the flattering version.
+11. **Leave the log a pointer.** One `closeout` entry — the result in a line, the report's path as its Target — so the next session finds this report by reading the log rather than by knowing it exists. Run the `decision-log` skill for the entry format.
 
 ## 3. Completion criteria
 
@@ -49,7 +51,7 @@ Read the report as the reviewer: **for every acceptance line, can you point at t
 Then six checks with a yes-or-no answer each:
 
 - every background process this session started is named, with how it ended
-- every gate folder this task opened has an empty `rejects/`
+- every gate folder recorded in the gate-opening `decision` entries is listed, its shipped files match the recorded hashes, and its rejected items are in the corresponding `rejected-archive/<gate-folder>/` reference-only archive
 - the budget line reports a count against the fuse
 - the log carries a `closeout` entry whose Target is this report
 - every claim about anything outside this task's own artifacts appears as a sentence somewhere in the report, not only as a field value
@@ -78,6 +80,11 @@ The two things that stay a judgment — that human contributions are credited to
 
 - [PASS] <line> — evidence: <path / output / number>
 - [FAIL] <line> — <what blocked it>
+
+## Independent verification
+
+- <verification outside the work's control: clean-environment rerun, artifact hash, environment-and-commit identity, or post-deployment smoke test; include the path / output / measurement>
+- <why this task does not need one, when applicable>
 
 ## Build record
 
