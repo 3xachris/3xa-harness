@@ -91,11 +91,12 @@ def main() -> int:
     absent = [item for item in evidence if not on_disk(item, root).exists()]
     print(f"[2/5] evidence paths exist: {'[WARN] ' + ', '.join(absent) if absent else '[OK] all exist'}")
 
-    # 2026-08-07 顧問線實跑修正：原本只認 "# Closeout: ...DONE" 一種標題寫法，換個寫法就判成非 DONE，
-    # 於是「宣稱完成卻沒有獨立功能驗證」照樣過關——正是本題要擋的東西。改為認全文的狀態詞。
+    # Read the closing state from anywhere in the report. An earlier version matched only
+    # one heading shape, so a report that worded its state differently was treated as
+    # "not DONE" and this check passed silently — the exact claim it exists to catch.
     done = bool(re.search("DONE", texts["report"])) and not re.search("CLOSED-FAILED", texts["report"])
-    # 2026-08-07 顧問線實跑補：標題格式不合時 done=False 會讓本題靜默略過並印 [OK]，
-    # 對驗證器而言 fail-open 是最危險的失效。全文找不到任何結案狀態詞＝警示，不當通過。
+    # A report with no closing state at all is a warning, never a pass. For a checker,
+    # failing open is the worst failure mode: it reports success by saying nothing.
     state_unknown = not re.search("DONE|CLOSED-FAILED|STOPPED", texts["report"])
     functional = re.findall(r"^- Functional verification:\s*(.+?)\s*\| evidence:\s*(\S+)$", texts["report"], re.MULTILINE)
     independent = any(not re.search(r"hash|environment|commit|identity", description, re.I) for description, _ in functional)
@@ -117,9 +118,9 @@ def main() -> int:
         if gate not in dispositions or gate not in listed:
             gate_warnings.append(gate)
             continue
-        # 2026-08-07 顧問線實跑修正：原本拿 log 的 Reviewer 去比報告的 disposition、
-        # 拿 Scope 去比 archive，欄位錯位導致格式正確的輸入也永遠誤報。
-        # log 端 groups = (Reviewer, Scope, Archive)；報告端 = (disposition, reviewer, archive)。
+        # Compare like with like: the log side carries (reviewer, scope, archive) and the
+        # report side carries (disposition, reviewer, archive). An earlier version lined
+        # these up wrong, so well-formed input warned every time.
         if dispositions[gate][0] != listed[gate][1] or dispositions[gate][2] != listed[gate][2]:
             gate_warnings.append(gate)
         archive = dispositions[gate][2]
@@ -133,8 +134,9 @@ def main() -> int:
     log_label = "[OK] closeout entry points to report" if report_target in closeout_targets or report_path.as_posix() in closeout_targets else "[WARN] no matching closeout entry"
     print(f"[5/5] decision log pointer: {log_label}")
     print(BOUNDARY)
-    # 2026-08-07 顧問線實跑修正：原本無條件 return 0，有警示與全過同碼，CI 收不到任何訊號，
-    # 也與「跳過要用不同碼」的設計自相矛盾。三態＝0 全過／1 有候選警示（人判，非退件）／2 無法驗證。
+    # Three exit states: 0 clean, 1 candidate warnings for a human to judge, 2 could not
+    # verify. Warnings and a clean run once shared exit 0, which left CI with no signal
+    # and contradicted the separate code the skipped case already had.
     any_warning = bool(missing) or bool(absent) or state_unknown or functional_warning or bool(gate_warnings) or "[WARN]" in log_label
     return 1 if any_warning else 0
 
