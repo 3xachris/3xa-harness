@@ -1,7 +1,7 @@
 {
   "name": "harness-core",
-  "version": "0.2.0",
-  "description": "The four-skill discipline loop for long-running agent work: freeze a task's scope into a workorder, gate sensory output behind human review, log decisions so they survive a context reset, and close out with evidence instead of claims.",
+  "version": "0.3.0",
+  "description": "The five-skill discipline loop for long-running agent work: freeze a task's scope into a workorder, gate sensory output behind human review, log decisions so they survive a context reset, hand off state when work changes hands, and close out with evidence instead of claims.",
   "author": {
     "name": "3xachris"
   },
@@ -13,12 +13,14 @@
     "review-gate",
     "decision-log",
     "workorder",
-    "closeout"
+    "closeout",
+    "handoff"
   ],
   "skills": [
     "./skills/core/workorder",
     "./skills/core/sensory-gate",
     "./skills/core/decision-log",
+    "./skills/core/handoff",
     "./skills/core/honest-closeout"
   ]
 }

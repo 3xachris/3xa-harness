@@ -2,7 +2,7 @@
 
 Discipline skills for agents doing long-running real work — the parts of the job that go wrong slowly.
 
-Four skills form one loop around a task: **freeze** what it is, **gate** what only a human can judge, **log** the decisions as they happen, **close out** with evidence. One optional add-on sits beside it. MIT, no dependencies, installable in under a minute.
+Five skills form one loop around a task: **freeze** what it is, **gate** what only a human can judge, **log** the decisions as they happen, **hand off** the state when work changes hands, **close out** with evidence. One optional add-on sits beside it. MIT, no dependencies, installable in under a minute.
 
 ## What this is for
 
@@ -11,6 +11,7 @@ Short tasks forgive a lot. Work that runs for weeks fails in ways prompting does
 - **Scope moves while the work runs.** What gets delivered is no longer what was agreed, and nobody can point at the moment it changed.
 - **Sensory judgment gets simulated.** An agent looks at a render, decides it's fine, and builds three more steps on top of it. "Looks fine to a language model" and "looks fine to the person who has to ship it" are different claims.
 - **Decisions evaporate.** A rejection or a correction gets said once, in a chat, and is gone at the next context reset — so the same mistake or the same argument comes back.
+- **State doesn't survive the handover.** Work moves to a fresh session or another person, and what they inherit is whatever's left in one person's memory — which is exactly the part that doesn't travel. The next session re-discovers the state instead of continuing from it.
 - **Reports outrun the evidence.** A summary written from memory at the end of a long session drifts, and drift runs toward the version where the work went well.
 
 Each skill is one concrete, checkable mechanism: a frozen document, a folder to drag rejects into, an index line you can grep, a report the chat message is copied out of. An agent can follow them, and a human can verify from the same disk state whether it did.
@@ -44,20 +45,20 @@ claude plugin marketplace add https://github.com/3xachris/3xa-harness
 claude plugin install harness-core@3xa-harness
 ```
 
-Codex users can install the same four core skills by copying their folders into the user skill directory:
+Codex users can install the same five core skills by copying their folders into the user skill directory:
 
 ```powershell
 $dest = Join-Path $HOME '.agents\skills'
 New-Item -ItemType Directory -Force $dest | Out-Null
-Copy-Item skills\core\workorder,skills\core\sensory-gate,skills\core\decision-log,skills\core\honest-closeout -Destination $dest -Recurse -Force
-Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\honest-closeout -Filter SKILL.md
+Copy-Item skills\core\workorder,skills\core\sensory-gate,skills\core\decision-log,skills\core\handoff,skills\core\honest-closeout -Destination $dest -Recurse -Force
+Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\handoff,$dest\honest-closeout -Filter SKILL.md
 ```
 
-The final command should list four `SKILL.md` files. Start a new Codex session and describe a matching task to confirm the skill is discovered and invoked.
+The final command should list five `SKILL.md` files. Start a new Codex session and describe a matching task to confirm the skill is discovered and invoked.
 
 | Plugin | What it adds |
 |---|---|
-| `harness-core` | The four-skill loop: `workorder`, `sensory-gate`, `decision-log`, `honest-closeout`. |
+| `harness-core` | The five-skill loop: `workorder`, `sensory-gate`, `decision-log`, `handoff`, `honest-closeout`. |
 | `harness-debug` | `staged-diagnosis` — the expanded version of the core diagnosis loop for errors that resist a first look. |
 
 ```bash
@@ -109,10 +110,11 @@ Claude Code hook binding is optional project wiring; the script itself is intend
 | [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass; `DONE` also needs independent functional verification outside the work's control. Resistant failures use the core diagnosis loop, with `staged-diagnosis` as its optional expanded version. |
 | [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with a `rejects/` subfolder; record the batch's file hashes in the decision log before review, and move rejected files to the reference-only `rejected-archive/<gate-folder>/`. |
 | [`decision-log`](skills/core/decision-log/SKILL.md) | One log with append-only entries and a maintained top summary, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session. |
+| [`handoff`](skills/core/handoff/SKILL.md) | One wide snapshot at the moment work changes hands — running work and its status, already-spent assets and their red lines, cross-thread dependencies, open debt — each answered or marked `none`, pointing at the decision log and any frozen orders rather than restating them. |
 | [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, `DONE` backed by independent functional verification while hashes and environment identity remain separate integrity evidence, gate approvals named by reviewer and batch scope, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |
 | [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Reproduce → minimise → hypothesise → instrument → fix → regression-test, each stage producing what the next one runs on. |
 
-Each skill carries its rules, its steps, and a completion criterion you can check. The four core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
+Each skill carries its rules, its steps, and a completion criterion you can check. The five core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
 
 For `DONE`, independent functional verification is deliberately separate from two other questions: hashes establish that the reviewed files are the same files, and environment identity establishes where they ran. Neither proves that the feature works. A sensory gate records the reviewer, batch, and approved scope in the decision log.
 
@@ -194,7 +196,7 @@ These are protocols, not enforcement. Nothing here blocks a step from being skip
 
 ## Credits
 
-The writing standard is Matt Pocock's [`writing-for-agents`](https://github.com/mattpocock/skills): positive targets over prohibitions, one source of truth per meaning, completion criteria that are checkable and exhaustive. The staged-diagnosis order is a generalisation of the same repo's `/diagnosing-bugs`. Both MIT.
+The writing standard is Matt Pocock's [`writing-for-agents`](https://github.com/mattpocock/skills): positive targets over prohibitions, one source of truth per meaning, completion criteria that are checkable and exhaustive. The staged-diagnosis order is a generalisation of the same repo's `/diagnosing-bugs`; `handoff` generalises the same repo's `handoff` and `claude-handoff` commands into a model-invoked, checklist-driven skill. All MIT.
 
 繁體中文版：[README.zh-TW.md](README.zh-TW.md)
 
