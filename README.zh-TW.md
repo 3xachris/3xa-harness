@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.png">
+  <img alt="3xa-harness" src="assets/hero-light.png">
+</picture>
+
 # 3xa-harness
 
 給長時間執行真實工作的 agent 使用的紀律 skills: 凍結範圍、把只能由人判斷的內容送進 gate、留下決策、用證據誠實收尾

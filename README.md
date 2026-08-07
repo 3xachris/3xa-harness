@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.png">
+  <img alt="3xa-harness" src="assets/hero-light.png">
+</picture>
+
 # 3xa-harness
 
 Discipline skills for agents doing long-running real work — the parts of the job that go wrong slowly.
