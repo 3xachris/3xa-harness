@@ -15,6 +15,26 @@ Short tasks forgive a lot. Work that runs for weeks fails in ways prompting does
 
 Each skill is one concrete, checkable mechanism: a frozen document, a folder to drag rejects into, an index line you can grep, a report the chat message is copied out of. An agent can follow them, and a human can verify from the same disk state whether it did.
 
+## When to open the loop
+
+Whether to freeze a `workorder` and run the full loop is a question about the task's **shape**, not its size — a big mechanical job and a five-line fix can land on either side of it. Open the loop when the task has any of these properties:
+
+- **It can outlive this conversation.** The work might not finish in one sitting, or a different session — yours tomorrow, or someone else's — will pick it up. A frozen order is what that session reads instead of asking you to remember.
+- **The boundary isn't settled yet.** The request is still fuzzy, or "while I'm in here" work keeps looking tempting. Freezing forces the boundary to exist before the first edit.
+- **It's handed to someone else.** A subagent, a contractor, a teammate — the order is the whole brief they get, in place of the conversation that produced it.
+- **Getting it wrong is expensive to undo.** A schema migration, a deleted dataset, a published release — anything a `git revert` doesn't cleanly fix.
+- **A human has to look at or listen to the result.** Renders, voice takes, edited video — `sensory-gate`'s reason to exist, and a workorder is what gives that review a fixed acceptance line to close against.
+
+None of these is "this will take a while": a long, single-sitting refactor that's easy to revert and nobody else will touch doesn't need any of it, no matter how many files it touches. A one-line config change that a different session inherits tomorrow does.
+
+## The light path
+
+Not opening the loop doesn't mean leaving nothing behind. When none of the five properties above apply, skip the order, the budget fuse, and the closeout report — but still write the one `decision-log` entry: what changed, the one-line reason, where the detail lives. That's the fact a cold read actually needs; the workorder's other six fields exist to protect things a five-minute fix doesn't have — scope that could drift, evidence a stranger needs to trust.
+
+All-or-nothing breaks both directions: skip everything, and the small fix that quietly became the big one never got framed as one; require everything, and small fixes get done off the books to dodge the paperwork, which is worse than no paperwork at all. The one log entry is the part worth keeping under any weight.
+
+If a "light" task turns out bigger than it looked — three files in, still finding new edges — that's the signal to stop and write the order retroactively, not to keep going bare.
+
 ## Install
 
 Two plugins in one marketplace — take the core, add what you need.
@@ -56,7 +76,25 @@ npx skills@latest add 3xachris/3xa-harness
 
 ## Executable closeout check
 
-The pack includes [`verify_closeout.py`](verify_closeout.py), a standalone Python 3 script because Python is commonly present on developer and CI machines and its standard library keeps this check dependency-free. Run it with one frozen order, one closeout report, and the decision log:
+### Before the first artifact
+
+Check this before building anything, not after: [`verify_closeout.py`](verify_closeout.py) needs Python 3.9+ on `PATH`. Confirm it once, before the first order exists:
+
+```bash
+python --version
+```
+
+If that command fails, or reports a version below 3.9, don't build the artifacts folder around this script — the script itself won't be able to start to tell you that later. Run the same five checks by eye instead:
+
+1. Every `AC-n` in the order has a matching `- [PASS/FAIL/BLOCKED] AC-n` line in the closeout.
+2. Every path after `| evidence:` opens.
+3. If the closeout's status is `DONE`, a `- Functional verification: ... | evidence: ...` line exists, its evidence path opens, and its description is more than a hash or environment claim.
+4. Every `> Gate: ...` line in the decision log has a matching `> Gate disposition: ...` line; the closeout's `[GATE]` line agrees with that disposition's reviewer and archive; and a non-`none` archive path opens.
+5. The decision log has a `> Type: closeout | Target: <path to this report>` line.
+
+Running the script catches slips in this by hand faster; it does not replace judging whether the content is right, on a runtime or off one.
+
+The pack includes `verify_closeout.py`, a standalone Python 3 script because Python is commonly present on developer and CI machines and its standard library keeps this check dependency-free. Run it with one frozen order, one closeout report, and the decision log:
 
 ```bash
 python verify_closeout.py artifacts/order.md artifacts/closeout.md docs/decisions.md --root .
@@ -106,6 +144,18 @@ Put the order, gate folders, evidence, and closeout under one artifacts folder. 
 ```bash
 python verify_closeout.py artifacts/checkout-20260807/order.md artifacts/checkout-20260807/closeout.md docs/decisions.md --root .
 ```
+
+## Integration templates
+
+Three files under [`templates/`](templates/) wire the pack into the places a PR actually gets reviewed — copy them in, don't rebuild them:
+
+| Template | Copy it to |
+|---|---|
+| [`PULL_REQUEST_TEMPLATE.md`](templates/PULL_REQUEST_TEMPLATE.md) | `.github/PULL_REQUEST_TEMPLATE.md` — mirrors `honest-closeout`'s report sections, so the same acceptance and verification lines answer both the PR and the closeout. |
+| [`ISSUE_TEMPLATE_workorder-request.md`](templates/ISSUE_TEMPLATE_workorder-request.md) | `.github/ISSUE_TEMPLATE/workorder-request.md` — captures a task's rough shape, plus a checklist against "When to open the loop", before anyone freezes it into an order. |
+| [`ci-verify-closeout.yml`](templates/ci-verify-closeout.yml) | `.github/workflows/verify-closeout.yml` — runs `verify_closeout.py` on every PR that touches an artifacts folder. Copied verbatim it checks this repo's own `.verification-demo/`; edit the three paths in the run step to point at your project. |
+
+The CI template deliberately does not fail the build on a warning — `verify_closeout.py`'s exit code 1 is a candidate finding for a human, matching the "Honest boundary" section below, not a merge gate. The template's own comments say what to remove if a team wants a hard gate instead.
 
 ## Minimal end-to-end example
 

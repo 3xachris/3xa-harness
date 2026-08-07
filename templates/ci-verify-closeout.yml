@@ -1,0 +1,42 @@
+# Copy into .github/workflows/verify-closeout.yml in your own project.
+#
+# As shipped, this step checks the pack's own .verification-demo/ example —
+# copy-paste it and push once to confirm the wiring runs, then edit the
+# three paths under "Run verify_closeout.py" to point at your project's own
+# order.md / closeout.md / decision log.
+#
+# Exit code 1 from verify_closeout.py is a candidate warning for a human,
+# not an automatic verdict (see README's honest boundary) — continue-on-error
+# keeps a warning from blocking the merge. Delete that line if your team
+# wants exit code 1 to block merges too. Exit code 2 (environment can't run
+# the check, or the report predates the structured fields) is also
+# non-blocking here for the same reason: it means "unverified", not "failed".
+
+name: verify-closeout
+
+on:
+  pull_request:
+    paths:
+      - 'artifacts/**'
+      - '.verification-demo/**'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Python runtime
+        run: python3 --version
+
+      - name: Run verify_closeout.py
+        continue-on-error: true
+        run: |
+          python3 verify_closeout.py \
+            .verification-demo/order.md \
+            .verification-demo/closeout.md \
+            .verification-demo/decisions.md \
+            --root .
+          # Real project: replace the three paths above with
+          # artifacts/<slug>/order.md, artifacts/<slug>/closeout.md, and
+          # your project's own decision log (e.g. docs/decisions.md).
