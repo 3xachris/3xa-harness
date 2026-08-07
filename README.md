@@ -54,8 +54,6 @@ npx skills@latest add 3xachris/3xa-harness
 
 **Pick one route: Claude plugin, Codex user skills, or skills.sh.** Each route installs the same skills; choosing more than one leaves every skill twice.
 
-## What's inside
-
 ## Executable closeout check
 
 The pack includes [`verify_closeout.py`](verify_closeout.py), a standalone Python 3 script because Python is commonly present on developer and CI machines and its standard library keeps this check dependency-free. Run it with one frozen order, one closeout report, and the decision log:
@@ -64,7 +62,7 @@ The pack includes [`verify_closeout.py`](verify_closeout.py), a standalone Pytho
 python verify_closeout.py artifacts/order.md artifacts/closeout.md docs/decisions.md --root .
 ```
 
-It checks that acceptance IDs are answered one by one, evidence paths exist, `DONE` has an independent functional verification, every opened gate has a named disposition and archive path when needed, and the decision log points to this report. Findings are candidate warnings for a human; they are not an automatic content verdict. A legacy report without the structured fields prints `Unable to verify, skipped` and exits differently from a completed check. The final line always states: this script checks form only; whether the content is correct is for a human.
+It checks that acceptance IDs are answered one by one, evidence paths exist, `DONE` has an independent functional verification, every opened gate has a named disposition and archive path when needed, and the decision log points to this report. This is a first-class handoff check: run it locally or in CI before asking a human to trust the closeout. Findings are candidate warnings for a human; they are not an automatic content verdict. A legacy report without the structured fields prints `Unable to verify, skipped` and exits differently from a completed check. The final line always states: this script checks form only; whether the content is correct is for a human.
 
 Claude Code hook binding is optional project wiring; the script itself is intended to be run by a person or CI.
 
@@ -78,7 +76,57 @@ Claude Code hook binding is optional project wiring; the script itself is intend
 
 Each skill carries its rules, its steps, and a completion criterion you can check. The four core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
 
-For `DONE`, independent functional verification is separate from hash and environment identity evidence; a sensory gate records the reviewer, batch, and approved scope in the decision log.
+For `DONE`, independent functional verification is deliberately separate from two other questions: hashes establish that the reviewed files are the same files, and environment identity establishes where they ran. Neither proves that the feature works. A sensory gate records the reviewer, batch, and approved scope in the decision log.
+
+## Bring it into an existing project
+
+Keep the harness records beside the project records, for example:
+
+```text
+your-project/
+├── AGENTS.md                    # or CLAUDE.md: the always-loaded pointer
+├── docs/decisions.md            # one append-only decision log
+└── artifacts/
+    └── checkout-20260807/
+        ├── order.md
+        ├── closeout.md
+        └── gate/review-01/
+```
+
+The `decision-log` skill makes a new session find the records automatically: add this once to the file your agent always loads:
+
+```markdown
+## Decision log
+
+`docs/decisions.md` — the decisions, rejections, and corrections for this project, newest last. Read it before starting work here.
+```
+
+Put the order, gate folders, evidence, and closeout under one artifacts folder. Existing issues and pull requests become evidence paths or links in the order and closeout; test reports become the evidence for the relevant `AC-n` line and, when run independently, the `Functional verification` line. The decision log records the gate opening, human disposition, corrections, and a final `closeout` pointer to the report. Run the verifier with the order, closeout, log, and project root:
+
+```bash
+python verify_closeout.py artifacts/checkout-20260807/order.md artifacts/checkout-20260807/closeout.md docs/decisions.md --root .
+```
+
+## Minimal end-to-end example
+
+The checked-in files under [`.verification-demo/`](.verification-demo/) are one small task wired from order to gate to closeout. They are intentionally ordinary Markdown so they can be copied into an existing project:
+
+```text
+.verification-demo/
+├── order.md
+├── closeout.md
+├── decisions.md
+├── evidence/verification.txt
+└── gate/review-01/approved.txt
+```
+
+The order freezes `AC-1` and `AC-2` with the same `AC-n` marker that the closeout answers. The log opens and disposes `review-01`, then points to the closeout. The closeout records the independent test, the gate approval, and evidence paths. Run this exact regression example from the repository root:
+
+```bash
+python verify_closeout.py .verification-demo/order.md .verification-demo/closeout.md .verification-demo/decisions.md --root .
+```
+
+It should parse the structured fields and finish with exit code `0`; the final boundary line still means that a human judges the content.
 
 ## It's working if
 

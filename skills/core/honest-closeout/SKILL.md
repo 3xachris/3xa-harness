@@ -80,7 +80,7 @@ The two things that stay a judgment — that human contributions are credited to
 
 ## Acceptance
 
-- [PASS] <line> — evidence: <path / output / number>
+- [PASS] AC-1: <line> | evidence: <path / output / number>
 - [FAIL] <line> — <what blocked it>
 
 ## Independent functional verification

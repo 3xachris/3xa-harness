@@ -63,7 +63,7 @@ The order itself is ready to freeze when all seven fields are filled and the hea
 **Budget fuse:** <number> <unit — runs, GPU-hours, API calls, install attempts, drafts>. On reaching it: stop and return what exists.
 
 **Acceptance**
-- [ ] <checkable line> — evidenced by <path / command output / number>
+- [ ] AC-1: <checkable line> | evidence: <path / command output / number>
 
 **Non-goals**
 - <what this order leaves alone>

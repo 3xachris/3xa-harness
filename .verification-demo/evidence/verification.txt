@@ -1,0 +1,2 @@
+status-check: 200 OK
+independent-test: python -m unittest; 1 test passed
