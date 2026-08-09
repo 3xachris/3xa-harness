@@ -408,8 +408,17 @@ def check_size(root: Path, cfg: dict, findings: list, volume: list, boundaries: 
         boundaries.append("size: no previous run recorded, so this run reports absolute "
                           "sizes only -- growth appears from the second run onward")
 
-    volume.append(("size: files measured against a limit", scanned,
-                   f"{len(over)} over limit"))
+    # The volume row must agree with the findings above it. Collapsing a
+    # misconfigured group into one SIZE-THRESHOLD row once left its breached
+    # files out of this count, so the report said "5 of 6 over the limit" in
+    # one table and "0 over limit" in the next -- a reader who catches a
+    # checker contradicting itself is right to stop trusting both numbers.
+    collapsed = sum(breached for _, breached, _, _ in misconfigured)
+    detail = f"{len(over) + collapsed} over limit"
+    if misconfigured:
+        detail += (f", {collapsed} of them under {len(misconfigured)} "
+                   f"suspect threshold(s) -- see SIZE-THRESHOLD")
+    volume.append(("size: files measured against a limit", scanned, detail))
     standing.append("size and growth -- re-run to see the trend; a single run has no direction")
 
 
