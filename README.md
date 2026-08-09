@@ -9,6 +9,40 @@ Discipline skills for agents doing long-running real work — the parts of the j
 
 Five skills form one loop around a task: **freeze** what it is, **gate** what only a human can judge, **log** the decisions as they happen, **hand off** the state when work changes hands, **close out** with evidence. One optional add-on sits beside it. MIT, no dependencies, installable in under a minute.
 
+## Pick your weight first
+
+You don't have to adopt the full loop to get value from this repo. Answer five questions about the task in front of you:
+
+```text
+New task
+│
+├─ Could it outlive this conversation, or be picked up by another session?
+├─ Is the boundary still unsettled — scope that could keep growing?
+├─ Is it handed to someone else (subagent, contractor, teammate)?
+├─ Would getting it wrong be expensive to undo?
+├─ Does a human have to look at or listen to the result?
+│
+├─ All no
+│   └─ Light: one decision-log entry — what changed, why, where the
+│      detail lives. No order, no closeout.
+│
+└─ Any yes
+    └─ Core: workorder + decision-log + honest-closeout
+       ├─ work changes hands            → add handoff
+       └─ renders / audio / video to judge → add sensory-gate
+```
+
+Each condition is unpacked in [When to open the loop](#when-to-open-the-loop). Then take only the weight you answered for:
+
+| Weight | What you take | Where |
+|---|---|---|
+| **Light** | Nothing to install — the practice is one log entry per change. To carry the skill itself, install the core plugin (unused skills stay silent) or copy `skills/core/decision-log/` alone into your agent's skill directory; there is no decision-log-only plugin. | [The light path](#the-light-path) |
+| **Core** | The `harness-core` plugin — the five-skill loop, fired per task by shape. | [Install](#install) |
+| **Validation** | Core, plus running `verify_closeout.py` before trusting a closeout. | [Executable closeout check](#executable-closeout-check) |
+| **CI** | Validation, plus the GitHub Actions template on every PR that touches an artifacts folder. | [Integration templates](#integration-templates) |
+
+`sensory-gate` only enters when there is something a human must see or hear — a full-path task with no media never opens a gate.
+
 ## What this is for
 
 Short tasks forgive a lot. Work that runs for weeks fails in ways prompting doesn't reach:
@@ -129,16 +163,16 @@ It checks that acceptance IDs are answered one by one, evidence paths exist, `DO
 
 Claude Code hook binding is optional project wiring; the script itself is intended to be run by a person or CI.
 
-| Skill | One-line usage |
+| Skill | Failure it closes |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | Freeze the task first — one sentence, known facts, materials and their licences, pinned parameters, a budget fuse, acceptance lines, non-goals — then run it to `DONE`, `CLOSED-FAILED`, or `STOPPED` in one pass; `DONE` also needs independent functional verification outside the work's control. Resistant failures use the core diagnosis loop, with `staged-diagnosis` as its optional expanded version. |
-| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Batch images, audio, or video into one gate folder with a `rejects/` subfolder; record the batch's file hashes in the decision log before review, and move rejected files to the reference-only `rejected-archive/<gate-folder>/`. |
-| [`decision-log`](skills/core/decision-log/SKILL.md) | One log with append-only entries and a maintained top summary, each entry opening with a fixed index line and pointing at where the detail lives — plus a one-line pointer in the file your project already loads every session. |
-| [`handoff`](skills/core/handoff/SKILL.md) | One wide snapshot at the moment work changes hands — running work and its status, already-spent assets and their red lines, cross-thread dependencies, open debt — each answered or marked `none`, pointing at the decision log and any frozen orders rather than restating them. |
-| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Every acceptance line answered with evidence, `DONE` backed by independent functional verification while hashes and environment identity remain separate integrity evidence, gate approvals named by reviewer and batch scope, human corrections credited, background processes proven stopped, and the chat message copied verbatim out of the report. |
-| [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Reproduce → minimise → hypothesise → instrument → fix → regression-test, each stage producing what the next one runs on. |
+| [`workorder`](skills/core/workorder/SKILL.md) | Scope drift — freeze the task and its acceptance lines before the first edit, run it to done in one pass. |
+| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | Simulated judgment — batch what only a human can see or hear into one reviewable folder. |
+| [`decision-log`](skills/core/decision-log/SKILL.md) | Evaporating decisions — one append-only log a cold session reads before the code. |
+| [`handoff`](skills/core/handoff/SKILL.md) | State that dies at the handover — one wide snapshot at the moment work changes hands. |
+| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | Reports outrunning evidence — every claim answered with a path a human can open. |
+| [`staged-diagnosis`](addons/debug/skills/staged-diagnosis/SKILL.md) | Errors that resist a first look — six stages, each producing what the next runs on. |
 
-Each skill carries its rules, its steps, and a completion criterion you can check. The five core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
+Each skill carries its rules, its steps, and a completion criterion you can check — the formats, fixed fields, and exact paths live in each `SKILL.md`, not here. The five core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
 
 For `DONE`, independent functional verification is deliberately separate from two other questions: hashes establish that the reviewed files are the same files, and environment identity establishes where they ran. Neither proves that the feature works. A sensory gate records the reviewer, batch, and approved scope in the decision log.
 

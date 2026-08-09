@@ -9,6 +9,40 @@
 
 五個核心 skill 圍成一個工作迴圈: `workorder` 凍結任務, `sensory-gate` 保留人的判斷, `decision-log` 讓決策跨過 context reset, `handoff` 在工作換手時交接狀態, `honest-closeout` 逐項連回證據. 另有一個可選的除錯 add-on. MIT, 零依賴, 不到一分鐘即可安裝
 
+## 先選份量, 再決定裝什麼
+
+不必先吞下整套迴圈才能用這個 repo. 對眼前的任務回答五個問題:
+
+```text
+新任務
+│
+├─ 會跨過這次對話存活, 或換一個 session 接手嗎?
+├─ 邊界還沒定, 範圍可能一直長大嗎?
+├─ 要交給別人(subagent、外包、隊友)嗎?
+├─ 做錯了很難撤銷嗎?
+├─ 要有人親眼看或親耳聽結果嗎?
+│
+├─ 全部否
+│   └─ Light: 只留一筆 decision-log —
+│      改了什麼、一行理由、細節放在哪. 不開 order 不寫收尾
+│
+└─ 任一是
+    └─ Core: workorder + decision-log + honest-closeout
+       ├─ 工作要換手          → 加 handoff
+       └─ 有圖/音/影要人判斷   → 加 sensory-gate
+```
+
+每個條件的完整說明在[什麼時候開完整迴圈](#什麼時候開完整迴圈). 然後只拿你答出來的那個份量:
+
+| 份量 | 拿什麼 | 在哪 |
+|---|---|---|
+| **Light** | 不用裝任何東西 — 這個做法就是每次改動留一筆紀錄. 想把 skill 本體帶著, 裝核心 plugin 即可(用不到的 skill 不會出聲), 或只複製 `skills/core/decision-log/` 進你的 skill 目錄; 目前沒有「只裝 decision-log」的獨立 plugin | [輕量路徑](#輕量路徑) |
+| **Core** | `harness-core` plugin — 五顆 skill 的完整迴圈, 依任務性質逐顆觸發 | [安裝](#安裝) |
+| **Validation** | Core 之上, 在信任收尾報告之前跑 `verify_closeout.py` | [可執行的收尾驗證](#可執行的收尾驗證) |
+| **CI** | Validation 之上, 用 GitHub Actions 範本在每個動到 artifacts 的 PR 上自動跑 | [整合範本](#整合範本) |
+
+`sensory-gate` 只在有東西必須由人看或聽時才進場 — 完整迴圈的任務若不含任何媒體, 從頭到尾不會開 gate
+
 ## 什麼時候開完整迴圈
 
 要不要凍結 `workorder` 並跑完整迴圈, 看的是任務的**性質**不是大小 — 一個龐大但機械式的工作和一個五行的小修都可能落在任一邊. 符合下列任一項就開:
@@ -178,13 +212,13 @@ python verify_closeout.py .verification-demo/order.md .verification-demo/closeou
 
 核心（`harness-core`）:
 
-| Skill | 用途 |
+| Skill | 它堵住哪種失敗 |
 |---|---|
-| [`workorder`](skills/core/workorder/SKILL.md) | 先凍結一句話、已知事實、材料、固定參數、預算、`AC-n` 驗收線和非目標 |
-| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 把圖片、音訊或影片集中到 gate 資料夾, 由人記錄 reviewer、批次和核准範圍 |
-| [`decision-log`](skills/core/decision-log/SKILL.md) | 讓決策、拒絕、修正和收尾跨過 context reset, 並由每次載入的專案檔指向它 |
-| [`handoff`](skills/core/handoff/SKILL.md) | 在工作換手的當下寫一份完整快照: 進行中的工作與狀態、已投入的資產與紅線、跨線依賴、未清的債, 每項都要有答案或明講「無」, 指向決策日誌與既有 order 而非重寫 |
-| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 逐條回答驗收, 把功能驗證與 hash、環境 identity 分開, 並保留人員修正和背景程序狀態 |
+| [`workorder`](skills/core/workorder/SKILL.md) | 範圍漂移 — 第一個編輯之前先凍結任務與驗收線, 一趟跑到底 |
+| [`sensory-gate`](skills/core/sensory-gate/SKILL.md) | 假裝有判斷 — 把只能由人看或聽的東西集中成一個可審的資料夾 |
+| [`decision-log`](skills/core/decision-log/SKILL.md) | 決策蒸發 — 一本 append-only 日誌, 冷啟動的 session 先讀它再讀 code |
+| [`handoff`](skills/core/handoff/SKILL.md) | 狀態死在換手那一刻 — 換手當下寫一份完整快照 |
+| [`honest-closeout`](skills/core/honest-closeout/SKILL.md) | 報告跑得比證據快 — 每個宣稱都連著一條人打得開的路徑 |
 
 加裝（`harness-debug`, 選裝）:
 
