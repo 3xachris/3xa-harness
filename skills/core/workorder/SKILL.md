@@ -21,7 +21,7 @@ Seven fields, plus the header line that freezes it.
 6. **Acceptance** — objective lines someone else could check without asking what was meant. Each one names how it will be evidenced: a path, a command's output, a measured number. The `DONE` condition is defined by `honest-closeout`, including its required verification outside the work's control.
 7. **Non-goals** — what this order leaves alone, especially the neighbouring work it would be natural to drift into.
 
-**Freezing** happens once, in writing, by the person who owns the outcome, and leaves the header line `[FROZEN <date> by <owner>]` on the order — the one artifact that says this document is now the contract.
+**Freezing** happens once, in writing, by the person who owns the outcome, and leaves the header line `[FROZEN <date> by <owner>]` on the order — the one artifact that says this document is now the contract. Where the project also tracks capability tiers, the tier picked in §4 rides the same header line.
 
 **Amending** is how a frozen order changes, and it has a fixed shape: a dated `## Amendment <n> — <date>, <who authorised it>` block appended to the bottom of the order, naming the field it changes and the new text in full. The original field stays where it is; the amendment is what governs from that date. Every amendment gets a `decision-log` entry of Type `amendment`, so the trail of what the contract said when survives outside the file too. Changes of mind larger than a field or two are a new order.
 
@@ -42,10 +42,36 @@ The order is ready for closeout when every acceptance line is classified line by
 
 The order itself is ready to freeze when all seven fields are filled and the header carries `[FROZEN <date> by <owner>]`; until that line exists, there is nothing to build against.
 
+## 4. Pick the tier before freezing
+
+Freezing an order also means picking what capability the work runs at — the project's own name for whichever tier costs the most to run: a stronger model, a more expensive agent mode, a senior reviewer's own attention. The axis that decides which one it gets isn't difficulty — it's whether this line of work has been walked before. **Pathfinding** — the failure modes aren't known yet and there's no successful sample to point at: a tool built from nothing, an unproven external API, a task shaped like nothing this project has finished — takes the strongest tier available, because a lighter one spends its budget re-discovering the same unknowns a stronger one would have seen through faster. **Known-road** — the path has already been walked: the tool exists and has been exercised, a first sample already shipped, the spec is settled — takes the standard tier, because what's left is executing a known shape, not discovering one. A single line of work changes tier as it matures: pathfinding opens it, and once a sample exists, the next order on that same line drops to known-road. Sending known-road capability to open a path burns it on unknowns it can't see past; sending pathfinding capability at quiet, already-proven work burns it on nothing.
+
+Where the project tracks this, the picked tier rides the freeze header alongside the owner: `[FROZEN <date> by <owner>, <tier>]`.
+
+**Check the order itself before raising the tier mid-run.** A run that's stuck usually reads as needing more capability; just as often it needs a better-written order. Check, in order: does the order state a checkable success criterion? does it say when to reach for which tool? does it name a stop condition? does it say how the result gets verified? Any one of those missing is the order's gap, not the model's — a stronger tier pointed at an unclear target just follows the unclear target with more conviction. Fix the gap and rerun at the same tier before escalating; escalate only once all four are confirmed present and the run still stalled.
+
+## 5. Hand it to whoever runs it next
+
+When a frozen order moves to another agent, another session, or another contractor, what they need is the order itself plus four facts a document alone doesn't carry: who they are for this task, what tier the work runs at, where the order lives, and the instruction to run it as frozen. Nothing else — the order already says what to build, and restating any of it in the handoff message creates a second copy that can drift from the first without anyone noticing which one changed.
+
+```text
+You are <role>. Tier: <tier>. Read
+<path to the frozen order>
+Run it as frozen.
+```
+
+The one exception is a fact that genuinely can't wait for an amendment — a service that's already running and must not be touched, say. That goes on its own added line, never folded into a restatement of the order's spec.
+
+## 6. Archive on close
+
+An order that's still running lives wherever the project keeps active work — one place, named once and reused, the same way `docs/decisions.md` is one place for decisions rather than one per task; an `orders/active/` folder moving to `orders/archive/` is a common shape for it. The closeout that reaches `DONE` or `CLOSED-FAILED` moves the order into that archive location in the same pass: archiving is part of closing out, not a chore closing out leaves for later, and a closeout that leaves its order sitting in the active location isn't finished, whatever its acceptance lines say. A `STOPPED` order isn't a closeout — the two-strike rule handed the decision back to the human — so it stays in the active location until whatever the human decides next produces a `DONE`, a `CLOSED-FAILED`, or a superseding order that carries it to archive instead.
+
+An order with no natural end — a standing instruction that repeats rather than completes, governing a recurring role instead of a single task — never archives by date. It going stale on the calendar doesn't mean it closed; only a closeout, or a later order that names it superseded, moves it. Sort by that question before filing anything old: did this order finish, or does it just keep running?
+
 ## Order template
 
 ```markdown
-# Order: <name> (<slug>_<YYYYMMDD>)   [FROZEN <date> by <owner>]
+# Order: <name> (<slug>_<YYYYMMDD>)   [FROZEN <date> by <owner>, <tier — optional>]
 
 **One sentence:** <the whole task>
 
@@ -75,4 +101,4 @@ New text: <the field in full, as it now reads>
 
 ## Judgment cases
 
-Four ways orders have failed in practice, and the rule each one bought: [`CASES.md`](CASES.md).
+Six ways orders have failed in practice, and the rule each one bought: [`CASES.md`](CASES.md).

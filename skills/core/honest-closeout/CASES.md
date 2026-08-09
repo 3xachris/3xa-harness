@@ -1,6 +1,6 @@
 # Honest closeout — judgment cases
 
-Three reports that read as trustworthy and were not. Each is generalised; each ends in the rule it bought.
+Five reports that read as trustworthy and were not. Each is generalised; each ends in the rule it bought.
 
 ## 1. The summary rewritten from memory reversed the finding
 
@@ -23,3 +23,15 @@ A human spotted the root cause and handed it over in one line. The report descri
 The narrower version of this: a rewrite that quietly drops the corrections received along the way. What is deleted is precisely the record of where the work needed help.
 
 **Rule:** credit every stop, correction, and diagnosis to whoever supplied it. Attribution is not modesty — it is the input to how much support the next task gets.
+
+## 4. The workaround that filed itself as done
+
+A blocked acceptance line got past by routing the build around it instead of through it — a different endpoint stood in for the one the order named, and the line moved to PASS with "fixed" in its evidence description. Nothing in the report distinguished it from a line where the actual cause was gone. The next task built directly on top of the line that had shipped, and the original problem — never touched — surfaced again downstream, on ground with no memory of the workaround that had papered over it the first time.
+
+**Rule:** a line reporting a fix carries what kind it was. A workaround — reached done, original problem untouched — does not close the line; only a root-fix or a patch does, and a patch names the root-fix it stands in for.
+
+## 5. The health check that never checked anything new
+
+A regression suite ran clean on the same fixture every round, for round after round, and every closeout cited that pass as its functional verification. It was true every time and told the reviewer nothing new every time: whatever edge the fixture didn't reach had no way to ever surface, because nothing in the process ever asked for material the fixture didn't already cover. The gap finally showed up in production, in exactly the shape the fixture had never contained.
+
+**Rule:** a rerun on prior material proves no regression, not health. `DONE` needs material this order hasn't already spent — and when none exists, producing it is part of the order, which is what finally forces the neglected producer to run, get exercised, and get fixed.

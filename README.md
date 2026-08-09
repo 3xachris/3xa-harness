@@ -314,6 +314,10 @@ Signals you can check in your own work, without opening a `SKILL.md`:
 
 These are protocols, not enforcement. Nothing here blocks a step from being skipped — they work because they're specific enough to follow and checkable enough that skipping shows. Physically enforcing a gate is a hook in your own project, and it's worth writing.
 
+## Who does what
+
+This pack assumes three roles run the loop — owner, reviewer, builder — and that every record it keeps has exactly one of them writing to it: [`docs/collaboration.md`](docs/collaboration.md).
+
 ## Credits
 
 The writing standard is Matt Pocock's [`writing-for-agents`](https://github.com/mattpocock/skills): positive targets over prohibitions, one source of truth per meaning, completion criteria that are checkable and exhaustive. The staged-diagnosis order is a generalisation of the same repo's `/diagnosing-bugs`; `handoff` generalises the same repo's `handoff` and `claude-handoff` commands into a model-invoked, checklist-driven skill. All MIT.

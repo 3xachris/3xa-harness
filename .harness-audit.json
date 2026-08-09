@@ -6,6 +6,7 @@
       "*.md",
       "skills/**/*.md",
       "addons/**/*.md",
+      "docs/**/*.md",
       ".verification-demo/**/*.md"
     ]
   },
@@ -15,12 +16,14 @@
     "size_targets": [
       { "glob": "*.md", "limit_kb": 60 },
       { "glob": "skills/**/*.md", "limit_kb": 40 },
-      { "glob": "addons/**/*.md", "limit_kb": 40 }
+      { "glob": "addons/**/*.md", "limit_kb": 40 },
+      { "glob": "docs/**/*.md", "limit_kb": 40 }
     ],
     "link_scan": [
       "*.md",
       "skills/**/*.md",
       "addons/**/*.md",
+      "docs/**/*.md",
       ".verification-demo/**/*.md"
     ],
     "reference_track": [
@@ -30,7 +33,8 @@
     "reference_cited_by": [
       "*.md",
       "skills/**/*.md",
-      "addons/**/*.md"
+      "addons/**/*.md",
+      "docs/**/*.md"
     ]
   }
 }

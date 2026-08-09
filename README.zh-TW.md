@@ -287,6 +287,10 @@ python verify_closeout.py .verification-demo/order.md .verification-demo/closeou
 
 這些是 protocols, 不是 enforcement. 它們不會物理阻止任何步驟被略過; 價值在於規則具體且可檢查, 略過時會留下可見缺口. 真正需要物理 enforcement 的 gate, 應由你的專案自行接 hook
 
+## 誰做什麼
+
+這包假設迴圈由三個角色跑 — owner、reviewer、builder — 而它保留的每份記錄都只有其中一個角色能寫: [`docs/collaboration.md`](docs/collaboration.md)
+
 ## Credits
 
 寫作標準參考 Matt Pocock 的 [`writing-for-agents`](https://github.com/mattpocock/skills): 用正向目標取代禁止語句, 每個意思只有一個權威定義, 每個步驟都有可檢查的完成條件. `staged-diagnosis` 的順序也是同一 repo 的 `/diagnosing-bugs` 泛化; `handoff` 則把同一 repo 的 `handoff` 與 `claude-handoff` 指令泛化成一顆 model-invoked、清單驅動的 skill. All MIT
