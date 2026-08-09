@@ -38,7 +38,7 @@
 |---|---|---|
 | **Light** | 不用裝任何東西 — 這個做法就是每次改動留一筆紀錄. 想把 skill 本體帶著, 裝核心 plugin 即可(用不到的 skill 不會出聲), 或只複製 `skills/core/decision-log/` 進你的 skill 目錄; 目前沒有「只裝 decision-log」的獨立 plugin | [輕量路徑](#輕量路徑) |
 | **Core** | `harness-core` plugin — 五顆 skill 的完整迴圈, 依任務性質逐顆觸發 | [安裝](#安裝) |
-| **Validation** | Core 之上, 在信任收尾報告之前跑 `verify_closeout.py` | [可執行的收尾驗證](#可執行的收尾驗證) |
+| **Validation** | Core 之上, 在信任收尾報告之前跑 `verify_closeout.py`, 再用 `harness-audit` 兩支檢查掃記錄本身 | [可執行的收尾驗證](#可執行的收尾驗證) |
 | **CI** | Validation 之上, 用 GitHub Actions 範本在每個動到 artifacts 的 PR 上自動跑 | [整合範本](#整合範本) |
 
 `sensory-gate` 只在有東西必須由人看或聽時才進場 — 完整迴圈的任務若不含任何媒體, 從頭到尾不會開 gate
@@ -79,10 +79,11 @@ claude plugin marketplace add https://github.com/3xachris/3xa-harness
 claude plugin install harness-core@3xa-harness
 ```
 
-需要較完整的診斷流程時, 也可以安裝選配的 debug plugin:
+需要較完整的診斷流程時, 也可以安裝選配的 debug plugin; 要機器掃自己的記錄, 加裝 audit plugin:
 
 ```bash
 claude plugin install harness-debug@3xa-harness
+claude plugin install harness-audit@3xa-harness
 ```
 
 Codex 使用者也可以把五個核心 skill 複製到使用者 skill 目錄:
@@ -93,6 +94,15 @@ New-Item -ItemType Directory -Force $dest | Out-Null
 Copy-Item skills\core\workorder,skills\core\sensory-gate,skills\core\decision-log,skills\core\handoff,skills\core\honest-closeout -Destination $dest -Recurse -Force
 Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\handoff,$dest\honest-closeout -Filter SKILL.md
 ```
+
+加裝的 skill 用同樣方式複製 — 每個 addon skill 資料夾都自帶所需腳本, 複製資料夾就是完整安裝:
+
+```powershell
+Copy-Item addons\debug\skills\staged-diagnosis,addons\audit\skills\claim-audit,addons\audit\skills\repo-audit -Destination $dest -Recurse -Force
+Get-ChildItem $dest\claim-audit,$dest\repo-audit -Filter *.py
+```
+
+第二行應該列出 `claim_audit.py` 與 `repo_audit.py`, 與各自的 `SKILL.md` 同層. 腳本與 skill 放同一層是刻意的: skill 的腳本若擺在 repo 別處, 任何以資料夾為單位複製的安裝路徑都會拿到一顆壞掉的 skill
 
 OpenCode 使用者要 clone 整個 repo 進 OpenCode 的 skill 目錄, 不是只複製裡面的 `skills/` 資料夾, 要留完整 repo 結構, 路徑會長成 `~/.opencode/skills/3xa-harness/skills/core/<skill-name>/SKILL.md`:
 
@@ -139,6 +149,51 @@ python verify_closeout.py artifacts/order.md artifacts/closeout.md docs/decision
 ```
 
 它只檢查格式和可追溯連結, 不替人判斷內容是否正確. 舊格式報告會輸出 `Unable to verify, skipped` 並以不同 exit code 結束. 最後一行會再次說明這個邊界
+
+## 記錄健檢
+
+`verify_closeout.py` 驗的是一件任務的紙本自洽. `harness-audit` 這個加裝驗的是整批記錄隨時間的腐化 — 那種不在單一任務內部、而在任務與任務之間長出來的東西. 兩支腳本沿用驗證器的建造約束: Python 3.9+, 純標準庫, 三態 exit code（`0` 乾淨 / `1` 候選, 交給人判 / `2` 無法驗證）, 最後一行都寫明它只驗形式
+
+**什麼時候裝**: 你的專案有「之後的工作會依賴」的 Markdown 記錄 — 決策日誌、收尾報告、帶數字的 spec — 而且不只一個 session 或一個人會讀它們. **什麼時候跳過**: 專案沒有這類記錄（`repo_audit.py` 五項有三項會讀不到東西, `claim_audit.py` 掃的會是沒人當成事實來源的散文）, 或記錄夠短命、沒人會拿著過期的那份行動. 這兩顆 skill 跟整包其他 skill 一樣是 model-invoked: 裝了之後, 任務對上觸發語境（審一份收尾、冷啟動接手專案）agent 自己會伸手拿; 兩支腳本不經 agent、人跑或 CI 跑也完全可用
+
+**跑一次的成本** — 2026-08-08 在本 repo 實測（21 份 Markdown 記錄、幾支腳本; 一個 77 檔 / 1.4 MB 的語料 0.41 秒跑完）: 兩支都在半秒內結束, 成本全在讀輸出 — [`claim_audit.py`](addons/audit/skills/claim-audit/claim_audit.py) 在這裡回了 2 行待判, [`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) 零 finding. 兩個數字都跟記錄裡實際堆了多少無出處或腐化材料成正比, 所以老專案的第一次執行最貴, baseline 就是為那一次而存在的. 有一個數字我們給不出來: `repo_audit.py` 程式碼訊號的誤報率 — 那需要一套已標好正確答案的語料, 我們沒有; 所以每一列訊號都明寫是「該看的地方」不是判決, 報告本身也這麼說
+
+```bash
+python addons/audit/skills/claim-audit/claim_audit.py --root .
+python addons/audit/skills/repo-audit/repo_audit.py --root . --report artifacts/repo-audit.md
+```
+
+[`claim_audit.py`](addons/audit/skills/claim-audit/claim_audit.py) 列出那些「把數字當事實寫下來, 卻沒有任何東西能讓讀者回查」的行 — 沒有路徑、沒有日期、沒有量測動詞, 也沒有標 `[UNVERIFIED]`. 它是 `honest-closeout` 所定義的 `[UNVERIFIED]` 慣例的機械那一半. 每一筆命中都要落成三種編輯之一 — 補出處、標未驗證、撤掉宣稱 — 或寫下判為假陽性的理由. `--baseline` 用內容雜湊記下當前結果, 讓既有專案採用時不必先清完一千行舊債; 反過來, 拿它去清掉沒人看過的命中, 就是把檢查變成綠燈, 那是這支唯一的誤用方式
+
+[`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) 跑五項量測、印一份報告: 超過該類別上限的檔案與相對上次執行的成長; 每一個不再解析得到的 `source:`、`[[WikiLink]]`、`| evidence:` 路徑與相對連結; 同一個病灶累積到門檻的 `correction` 條目; 程式碼裡的債務訊號（吞掉的例外、被關掉的檢查、暫時性標記、要人手動同步的註解、寫死進共用常數的日期）; 以及在期限內沒有任何東西引用過的追蹤文件. 命中以 `file:line` 加「該做哪個編輯」成表, 後面接掃描量體、天生要重跑的常駐項, 以及 — 報告空的時候第一個該讀的 — 這次執行測不到的每一件事, 包含任何讀到空輸入集因而什麼都沒報的檢查
+
+`repo_audit.py` 五項檢查裡有三項 — size、pointers、corrections — 是去解析 `decision-log` 的條目, 所以需要真的有一本日誌可讀; 沒有的時候它會在報告裡逐項點名說自己沒讀到東西, 而不是回一個乾淨結果. signals 與 references 兩項在任何 repo 都能跑. 有用 baseline 就把 `.harness-audit-baseline.json` 進版控: baseline 不進版控等於每個隊友第一次跑都吃到整批舊債, 這檢查一週內就會死. 另外兩個產生檔 `.harness-audit-history.jsonl` 與 `.harness-audit-references.json` 每次執行重寫、不承載任何判斷, 不必進版控
+
+兩支都會讀專案根目錄的 `.harness-audit.json`, 沒有這個檔也能照上面的預設版面直接跑. [本 repo 自己的設定檔](.harness-audit.json)就是一份實例: 它的記錄放在 `.verification-demo/` 而不是 `docs/` 與 `artifacts/`, 所以只改了路徑, 其餘沿用. 門檻值 — 日誌 200 KB 分卷、同一病灶三次更正、180 天沒被引用 — 是為了看得見而挑的整數, 不是對你專案的量測結果; 遇到第一個對你不成立的, 就改掉並記下理由
+
+把 `claim_audit.py` 掛在寫檔動作上是選配的專案接線, 性質與收尾驗證器相同. 在 Claude Code 裡就是 `.claude/settings.json` 的一個 `PostToolUse` hook, 只掃剛被改的那一個檔, 只報基線之後新增的宣稱:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "python addons/audit/skills/claim-audit/claim_audit.py --hook", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+hook 模式下這支腳本 fail **open**: 任何內部錯誤都放行該次編輯, 並且把錯誤報出來而不是吞掉. 它是稽核不是門鎖, 而一個看起來在跑、實際什麼都沒做的閘, 比沒有閘更糟. 不接 hook 也完全可用, 人跑或 CI 跑都行
+
+| Skill | 它堵住哪種失敗 |
+|---|---|
+| [`claim-audit`](addons/audit/skills/claim-audit/SKILL.md) | 憑記憶寫出來的數字 — 每個宣稱都帶著出處、標記, 或一條寫下來的駁回理由 |
+| [`repo-audit`](addons/audit/skills/repo-audit/SKILL.md) | 記錄在任務之間腐化 — 斷掉的指標、重複的補丁、沒人引用的文件, 每一筆都附該做的編輯 |
 
 ## 接入既有專案
 

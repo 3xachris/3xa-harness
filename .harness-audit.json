@@ -1,0 +1,36 @@
+{
+  "_comment": "This repo's own audit config, and a worked example of one. Both tools run with no config at all against the layout the README recommends (docs/decisions.md plus an artifacts/ folder). This repo keeps its records under .verification-demo/ instead, so the paths below are the values that had to change.",
+
+  "claim_audit": {
+    "targets": [
+      "*.md",
+      "skills/**/*.md",
+      "addons/**/*.md",
+      ".verification-demo/**/*.md"
+    ]
+  },
+
+  "repo_audit": {
+    "decision_log": ".verification-demo/decisions.md",
+    "size_targets": [
+      { "glob": "*.md", "limit_kb": 60 },
+      { "glob": "skills/**/*.md", "limit_kb": 40 },
+      { "glob": "addons/**/*.md", "limit_kb": 40 }
+    ],
+    "link_scan": [
+      "*.md",
+      "skills/**/*.md",
+      "addons/**/*.md",
+      ".verification-demo/**/*.md"
+    ],
+    "reference_track": [
+      "skills/**/SKILL.md",
+      "addons/**/skills/**/SKILL.md"
+    ],
+    "reference_cited_by": [
+      "*.md",
+      "skills/**/*.md",
+      "addons/**/*.md"
+    ]
+  }
+}

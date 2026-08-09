@@ -38,7 +38,7 @@ Each condition is unpacked in [When to open the loop](#when-to-open-the-loop). T
 |---|---|---|
 | **Light** | Nothing to install — the practice is one log entry per change. To carry the skill itself, install the core plugin (unused skills stay silent) or copy `skills/core/decision-log/` alone into your agent's skill directory; there is no decision-log-only plugin. | [The light path](#the-light-path) |
 | **Core** | The `harness-core` plugin — the five-skill loop, fired per task by shape. | [Install](#install) |
-| **Validation** | Core, plus running `verify_closeout.py` before trusting a closeout. | [Executable closeout check](#executable-closeout-check) |
+| **Validation** | Core, plus running `verify_closeout.py` before trusting a closeout, and the `harness-audit` checks over the records themselves. | [Executable closeout check](#executable-closeout-check) |
 | **CI** | Validation, plus the GitHub Actions template on every PR that touches an artifacts folder. | [Integration templates](#integration-templates) |
 
 `sensory-gate` only enters when there is something a human must see or hear — a full-path task with no media never opens a gate.
@@ -104,6 +104,15 @@ Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\handof
 
 The final command should list five `SKILL.md` files. Start a new Codex session and describe a matching task to confirm the skill is discovered and invoked.
 
+The add-on skills copy the same way — each add-on skill folder is self-contained, scripts included, so copying the folder is the whole install:
+
+```powershell
+Copy-Item addons\debug\skills\staged-diagnosis,addons\audit\skills\claim-audit,addons\audit\skills\repo-audit -Destination $dest -Recurse -Force
+Get-ChildItem $dest\claim-audit,$dest\repo-audit -Filter *.py
+```
+
+The second command should list `claim_audit.py` and `repo_audit.py` next to their `SKILL.md`. That co-location is deliberate: a skill whose script lives elsewhere in the repo arrives broken by any install route that copies folders.
+
 OpenCode users clone the whole repo into the OpenCode skills directory — not just the inner `skills/` folder, the full repo, so the path comes out `~/.opencode/skills/3xa-harness/skills/core/<skill-name>/SKILL.md`:
 
 ```sh
@@ -116,9 +125,11 @@ OpenCode auto-discovers every `SKILL.md` under `~/.opencode/skills/`; no config 
 |---|---|
 | `harness-core` | The five-skill loop: `workorder`, `sensory-gate`, `decision-log`, `handoff`, `honest-closeout`. |
 | `harness-debug` | `staged-diagnosis` — the expanded version of the core diagnosis loop for errors that resist a first look. |
+| `harness-audit` | `claim-audit` and `repo-audit` — two runnable checks over the records themselves, for claims with no source and for pointers, sizes, and signals that decayed quietly. |
 
 ```bash
 claude plugin install harness-debug@3xa-harness
+claude plugin install harness-audit@3xa-harness
 ```
 
 Then describe the task normally — "freeze this before we start", "review this batch of renders", "log why we dropped approach X" — and the matching skill fires on its own. Every skill here is model-invoked.
@@ -175,6 +186,51 @@ Claude Code hook binding is optional project wiring; the script itself is intend
 Each skill carries its rules, its steps, and a completion criterion you can check — the formats, fixed fields, and exact paths live in each `SKILL.md`, not here. The five core skills also ship a `CASES.md` — the incidents that bought each rule, generalised.
 
 For `DONE`, independent functional verification is deliberately separate from two other questions: hashes establish that the reviewed files are the same files, and environment identity establishes where they ran. Neither proves that the feature works. A sensory gate records the reviewer, batch, and approved scope in the decision log.
+
+## Record audits
+
+`verify_closeout.py` checks one task's paperwork against itself. The `harness-audit` add-on checks the records as a body, over time — the decay that shows up between tasks rather than inside one. Two scripts, built to the same constraints as the verifier: Python 3.9+, standard library only, three exit states (`0` clean, `1` candidates for a human, `2` could not check), and a final line saying that form is all they judge.
+
+**Install it when** your project keeps Markdown records that later work depends on — a decision log, closeout reports, specs with numbers in them — and more than one session or person reads them. **Skip it when** the project has no such records (three of `repo_audit.py`'s five checks would read nothing, and `claim_audit.py` would scan prose nobody treats as a source of truth), or when the records are transient enough that nobody acts on a stale one. The skills are model-invoked like everything else in this pack: once installed, an agent reaches for them when a task matches their trigger phrasing — reviewing a closeout, picking up a cold project — and either script also runs by hand or in CI with no agent involved.
+
+**What a run costs you** — measured on this repository on 2026-08-08 (21 Markdown records, a few scripts; a 77-file / 1.4 MB corpus ran in 0.41 s): both scripts finish in under half a second, and the run's output is the whole cost — [`claim_audit.py`](addons/audit/skills/claim-audit/claim_audit.py) returned 2 lines to judge here, [`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) zero findings. Both counts scale with how much unsourced or decayed material the records actually hold, so the first run on an older project is the expensive one and the baseline exists for exactly that. One number we cannot give you: a false-positive rate for `repo_audit.py`'s code signals, which would need a corpus with known-correct answers that we don't have — every signal row is explicitly a place to look, not a verdict, and the report says so.
+
+```bash
+python addons/audit/skills/claim-audit/claim_audit.py --root .
+python addons/audit/skills/repo-audit/repo_audit.py --root . --report artifacts/repo-audit.md
+```
+
+[`claim_audit.py`](addons/audit/skills/claim-audit/claim_audit.py) lists the lines that state a number as fact with nothing a reader could check it against — no path, no date, no measurement, and no `[UNVERIFIED]` tag either. It is the mechanical half of the `[UNVERIFIED]` convention `honest-closeout` defines. Each hit gets one of three edits — add the source, mark it unverified, delete the claim — or a written reason it was dismissed. `--baseline` records the current findings by content hash so an existing project can adopt the check without a thousand-line backlog blocking the first run; re-running it to clear findings nobody read turns the check into a green light, which is the one way to misuse it.
+
+[`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) runs five measurements and prints one report: files past the size limit set for their class and what grew since the last run; every `source:`, `[[WikiLink]]`, `| evidence:` path and relative link that no longer resolves; `correction` entries piling up on one cause past the escalation threshold; debt signals in source (swallowed exceptions, disabled checks, temporary markers, hand-sync comments, dates baked into shared constants); and tracked documents nothing has referenced inside the stale window. Findings arrive as a table of `file:line` plus the edit that closes each one, followed by the volume scanned, the checks that are recurring by nature, and — the section to read first when a report comes back empty — everything this run could not measure, including any check that read an empty input set.
+
+Three of `repo_audit.py`'s five checks — size, pointers, corrections — resolve `decision-log` entries, so they need a log to read and say so by name when there isn't one; signals and references work on any repository. Commit `.harness-audit-baseline.json` when you use one: a baseline outside version control hands every teammate the whole backlog on their first run. The two generated files, `.harness-audit-history.jsonl` and `.harness-audit-references.json`, are rewritten each run and carry no decisions.
+
+Both read `.harness-audit.json` at the project root when it exists, and run against the layout above without one. [This repo's own config](.harness-audit.json) is a worked example: it keeps its records under `.verification-demo/` rather than `docs/` and `artifacts/`, so it sets the paths and nothing else. The thresholds — 200 KB before a log splits, three corrections on one cause, 180 days without a reference — are round numbers chosen to be visible, not measurements of your project; change the first one that is wrong for you and record why.
+
+Binding `claim_audit.py` to a write is optional project wiring, the same way the closeout check is. In Claude Code that is a `PostToolUse` hook in `.claude/settings.json`, which runs it against the one file that changed and reports only claims added since the baseline:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "python addons/audit/skills/claim-audit/claim_audit.py --hook", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+In hook mode the script fails **open**: any internal error lets the edit through and reports the error rather than swallowing it. It is an audit, not a door lock, and a gate that looks like it is running while silently doing nothing is worse than no gate. Both scripts run under a person or CI with no hook at all.
+
+| Skill | Failure it closes |
+|---|---|
+| [`claim-audit`](addons/audit/skills/claim-audit/SKILL.md) | Numbers written from memory — every claim carries a source, a tag, or a recorded reason it was dismissed. |
+| [`repo-audit`](addons/audit/skills/repo-audit/SKILL.md) | Records decaying between tasks — broken pointers, repeat patches, and unreferenced documents, each with the edit that closes it. |
 
 ## Bring it into an existing project
 

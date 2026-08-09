@@ -43,6 +43,24 @@
       "skills": [
         "./skills/staged-diagnosis"
       ]
+    },
+    {
+      "name": "harness-audit",
+      "source": "./addons/audit",
+      "description": "Two runnable checks over a project's own records: list the numbers stated as fact with no source a reader could check, and report the records and code that decayed quietly — each finding with the file, the line, and the edit that closes it.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "keywords": [
+        "agent-skills",
+        "audit",
+        "documentation-debt",
+        "link-checker",
+        "technical-debt"
+      ],
+      "skills": [
+        "./skills/claim-audit",
+        "./skills/repo-audit"
+      ]
     }
   ]
 }
