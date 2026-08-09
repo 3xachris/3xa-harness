@@ -38,7 +38,7 @@
 |---|---|---|
 | **Light** | 不用裝任何東西 — 這個做法就是每次改動留一筆紀錄. 想把 skill 本體帶著, 裝核心 plugin 即可(用不到的 skill 不會出聲), 或只複製 `skills/core/decision-log/` 進你的 skill 目錄; 目前沒有「只裝 decision-log」的獨立 plugin | [輕量路徑](#輕量路徑) |
 | **Core** | `harness-core` plugin — 五顆 skill 的完整迴圈, 依任務性質逐顆觸發 | [安裝](#安裝) |
-| **Validation** | Core 之上, 在信任收尾報告之前跑 `verify_closeout.py`, 再用 `harness-audit` 兩支檢查掃記錄本身 | [可執行的收尾驗證](#可執行的收尾驗證) |
+| **Validation** | Core 之上, 在信任收尾報告之前跑 `verify_closeout.py`, 再用 `harness-audit` 兩支檢查掃記錄本身（用這層前須先裝 `harness-audit` add-on, 見[安裝](#安裝)） | [可執行的收尾驗證](#可執行的收尾驗證) |
 | **CI** | Validation 之上, 用 GitHub Actions 範本在每個動到 artifacts 的 PR 上自動跑 | [整合範本](#整合範本) |
 
 `sensory-gate` 只在有東西必須由人看或聽時才進場 — 完整迴圈的任務若不含任何媒體, 從頭到尾不會開 gate
@@ -152,11 +152,11 @@ python verify_closeout.py artifacts/order.md artifacts/closeout.md docs/decision
 
 ## 記錄健檢
 
-`verify_closeout.py` 驗的是一件任務的紙本自洽. `harness-audit` 這個加裝驗的是整批記錄隨時間的腐化 — 那種不在單一任務內部、而在任務與任務之間長出來的東西. 兩支腳本沿用驗證器的建造約束: Python 3.9+, 純標準庫, 三態 exit code（`0` 乾淨 / `1` 候選, 交給人判 / `2` 無法驗證）, 最後一行都寫明它只驗形式
+`verify_closeout.py` 驗的是一件任務的紙本自洽. `harness-audit` 這個加裝驗的是整批記錄隨時間的腐化 — 那種不在單一任務內部、而在任務與任務之間長出來的東西. 兩支腳本沿用驗證器的建造約束: Python 3.9+, 純標準庫, 三態 exit code（`0` 乾淨 / `1` 候選, 交給人判 / `2` 無法驗證）, 最後一行都寫明它只驗形式. 它們也刻意 fail open — hook 壞了永不擋寫入 — 所以這一切都不是安全邊界: 真正涉及安全的事屬 runtime 權限、輸入驗證與伺服器端拒絕的職責, 不屬記錄稽核
 
 **什麼時候裝**: 你的專案有「之後的工作會依賴」的 Markdown 記錄 — 決策日誌、收尾報告、帶數字的 spec — 而且不只一個 session 或一個人會讀它們. **什麼時候跳過**: 專案沒有這類記錄（`repo_audit.py` 五項有三項會讀不到東西, `claim_audit.py` 掃的會是沒人當成事實來源的散文）, 或記錄夠短命、沒人會拿著過期的那份行動. 這兩顆 skill 跟整包其他 skill 一樣是 model-invoked: 裝了之後, 任務對上觸發語境（審一份收尾、冷啟動接手專案）agent 自己會伸手拿; 兩支腳本不經 agent、人跑或 CI 跑也完全可用
 
-**跑一次的成本** — 2026-08-08 在本 repo 實測（21 份 Markdown 記錄、幾支腳本; 一個 77 檔 / 1.4 MB 的語料 0.41 秒跑完）: 兩支都在半秒內結束, 成本全在讀輸出 — [`claim_audit.py`](addons/audit/skills/claim-audit/claim_audit.py) 在這裡回了 2 行待判, [`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) 零 finding. 兩個數字都跟記錄裡實際堆了多少無出處或腐化材料成正比, 所以老專案的第一次執行最貴, baseline 就是為那一次而存在的. 有一個數字我們給不出來: `repo_audit.py` 程式碼訊號的誤報率 — 那需要一套已標好正確答案的語料, 我們沒有; 所以每一列訊號都明寫是「該看的地方」不是判決, 報告本身也這麼說
+**跑一次的成本** — 歷史基準快照, 2026-08-08 在本 repo 實測（21 份 Markdown 記錄、幾支腳本; 一個 77 檔 / 1.4 MB 的語料 0.41 秒跑完; 其後 repo 已再長大, 要當下數字請重跑一次）: 兩支都在半秒內結束, 成本全在讀輸出 — [`claim_audit.py`](addons/audit/skills/claim-audit/claim_audit.py) 在這裡回了 2 行待判, [`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) 零 finding. 兩個數字都跟記錄裡實際堆了多少無出處或腐化材料成正比, 所以老專案的第一次執行最貴, baseline 就是為那一次而存在的. 有一個數字我們給不出來: `repo_audit.py` 程式碼訊號的誤報率 — 那需要一套已標好正確答案的語料, 我們沒有; 所以每一列訊號都明寫是「該看的地方」不是判決, 報告本身也這麼說
 
 ```bash
 python addons/audit/skills/claim-audit/claim_audit.py --root .
@@ -165,7 +165,7 @@ python addons/audit/skills/repo-audit/repo_audit.py --root . --report artifacts/
 
 [`claim_audit.py`](addons/audit/skills/claim-audit/claim_audit.py) 列出那些「把數字當事實寫下來, 卻沒有任何東西能讓讀者回查」的行 — 沒有路徑、沒有日期、沒有量測動詞, 也沒有標 `[UNVERIFIED]`. 它是 `honest-closeout` 所定義的 `[UNVERIFIED]` 慣例的機械那一半. 每一筆命中都要落成三種編輯之一 — 補出處、標未驗證、撤掉宣稱 — 或寫下判為假陽性的理由. `--baseline` 用內容雜湊記下當前結果, 讓既有專案採用時不必先清完一千行舊債; 反過來, 拿它去清掉沒人看過的命中, 就是把檢查變成綠燈, 那是這支唯一的誤用方式
 
-[`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) 跑五項量測、印一份報告: 超過該類別上限的檔案與相對上次執行的成長; 每一個不再解析得到的 `source:`、`[[WikiLink]]`、`| evidence:` 路徑與相對連結; 同一個病灶累積到門檻的 `correction` 條目; 程式碼裡的債務訊號（吞掉的例外、被關掉的檢查、暫時性標記、要人手動同步的註解、寫死進共用常數的日期）; 以及在期限內沒有任何東西引用過的追蹤文件. 命中以 `file:line` 加「該做哪個編輯」成表, 後面接掃描量體、天生要重跑的常駐項, 以及 — 報告空的時候第一個該讀的 — 這次執行測不到的每一件事, 包含任何讀到空輸入集因而什麼都沒報的檢查
+[`repo_audit.py`](addons/audit/skills/repo-audit/repo_audit.py) 跑五項量測、印一份報告: 超過該類別上限的檔案與相對上次執行的成長; 每一個不再解析得到的 `source:`、`[[WikiLink]]`、`| evidence:` 路徑與相對連結; 同一個病灶累積到門檻的 `correction` 條目; 程式碼裡的債務訊號 — 六種訊號: 吞掉的例外、被關掉的檢查、暫時性標記、要人手動同步的註解、寫死進共用常數的日期、標了封存卻仍被活代碼引用的檔案; 以及在期限內沒有任何東西引用過的追蹤文件. 命中以 `file:line` 加「該做哪個編輯」成表, 後面接掃描量體、天生要重跑的常駐項, 以及 — 報告空的時候第一個該讀的 — 這次執行測不到的每一件事, 包含任何讀到空輸入集因而什麼都沒報的檢查
 
 `repo_audit.py` 五項檢查裡有三項 — size、pointers、corrections — 是去解析 `decision-log` 的條目, 所以需要真的有一本日誌可讀; 沒有的時候它會在報告裡逐項點名說自己沒讀到東西, 而不是回一個乾淨結果. signals 與 references 兩項在任何 repo 都能跑. 有用 baseline 就把 `.harness-audit-baseline.json` 進版控: baseline 不進版控等於每個隊友第一次跑都吃到整批舊債, 這檢查一週內就會死. 另外兩個產生檔 `.harness-audit-history.jsonl` 與 `.harness-audit-references.json` 每次執行重寫、不承載任何判斷, 不必進版控
 
