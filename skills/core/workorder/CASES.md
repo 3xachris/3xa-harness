@@ -1,6 +1,6 @@
 # Workorder — judgment cases
 
-Six ways a written order failed in practice. Each one is generalised; each ends in the rule it bought.
+Seven ways a written order failed in practice. Each one is generalised; each ends in the rule it bought.
 
 ## 1. "Same as the final version" resolved to two files
 
@@ -37,3 +37,9 @@ A run stalled twice on the same sub-problem, and the response was to hand the ne
 A directive that ran every cycle rather than finishing once sat unopened for a stretch, and its file date crept past the project's usual review window. It got swept into the archive along with everything else that hadn't moved in a while, and the next cycle it was supposed to govern ran without it — nobody had told it to stop, the calendar had just made it look finished.
 
 **Rule:** archive on a closeout, never on a file's age. An order that repeats instead of completing has no closing date for staleness to measure against.
+
+## 7. The relay that arrived and the audit that still ran
+
+A closeout's summary crossed automatically to the session that had dispatched the work, exactly as the order named it would, and the receiving session read it as the state of the task. A routine disk audit ran anyway afterward, out of habit rather than suspicion — and it found a file-level change the summary hadn't mentioned, made after the summary was written but before the audit ran. Nothing about the relay had failed; the channel had faithfully delivered what was true a few minutes before it arrived.
+
+**Rule:** a relayed summary is a notification, not a fact re-established. The disk is still what an audit checks, and a hop landing on time is not the same claim as a hop landing current.
