@@ -68,7 +68,7 @@ Where the harness this order runs on can pass a message between agent sessions o
 
 A message arriving through that channel is checked the way `docs/collaboration.md` treats any output from outside a task's own loop — material, not a standing instruction acted on unread. Outward, irreversible actions never ride the automatic chain regardless of what a relayed message asks for; authority for those always traces back to the human who froze the order, never to whichever session last relayed a message.
 
-Whether a declared hop actually arrives is a property of the harness underneath, not of the order: a session nobody is watching, or one that only wakes on a schedule, may never see it. This describes the shape a relay takes where a harness supports one — it doesn't promise every harness does, and naming a hop the running harness can't deliver just means that hop doesn't fire; the rest of the order still runs.
+Where the harness offers session-to-session messaging, a declared hop fires on its own; where it doesn't, the same hop is a human carrying the dispatch phrase from §5 instead — the declared-hop rule applies identically either way, because what's authorised was never the channel, it was the recipient, the trigger, and the template. A session nobody is watching, or one that only wakes on a schedule, may not be there to receive either form. This describes the shape a relay takes, automated or carried by hand; it doesn't claim every harness automates it, and a hop the running harness can't deliver on its own just falls back to the human form — the rest of the order still runs either way.
 
 ## 6. Archive on close
 
