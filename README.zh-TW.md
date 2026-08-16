@@ -86,7 +86,14 @@ claude plugin install harness-debug@3xa-harness
 claude plugin install harness-audit@3xa-harness
 ```
 
-Codex 使用者也可以把五個核心 skill 複製到使用者 skill 目錄:
+Codex 使用者也可以把五個核心 skill 複製到使用者 skill 目錄. Windows PowerShell 從全新 checkout 開始:
+
+```powershell
+git clone https://github.com/3xachris/3xa-harness.git
+Set-Location .\3xa-harness
+```
+
+如果你已經有這個 repo, 先切到 repo root, 再繼續下面的安裝與驗證指令:
 
 ```powershell
 $dest = Join-Path $HOME '.agents\skills'
@@ -94,6 +101,19 @@ New-Item -ItemType Directory -Force $dest | Out-Null
 Copy-Item skills\core\workorder,skills\core\sensory-gate,skills\core\decision-log,skills\core\handoff,skills\core\honest-closeout -Destination $dest -Recurse -Force
 Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\handoff,$dest\honest-closeout -Filter SKILL.md
 ```
+
+macOS 或 Linux 使用者可以用同樣的 user-skill 路徑:
+
+```sh
+git clone https://github.com/3xachris/3xa-harness.git
+cd 3xa-harness
+dest="$HOME/.agents/skills"
+mkdir -p "$dest"
+cp -R skills/core/workorder skills/core/sensory-gate skills/core/decision-log skills/core/handoff skills/core/honest-closeout "$dest/"
+find "$dest/workorder" "$dest/sensory-gate" "$dest/decision-log" "$dest/handoff" "$dest/honest-closeout" -name SKILL.md -print
+```
+
+最後一行應該列出五條 `SKILL.md` 路徑. 開一個新的 Codex session, 描述一個符合條件的任務, 確認 skill 能被找到並觸發.
 
 加裝的 skill 用同樣方式複製 — 每個 addon skill 資料夾都自帶所需腳本, 複製資料夾就是完整安裝:
 

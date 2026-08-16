@@ -93,7 +93,14 @@ claude plugin marketplace add https://github.com/3xachris/3xa-harness
 claude plugin install harness-core@3xa-harness
 ```
 
-Codex users can install the same five core skills by copying their folders into the user skill directory:
+Codex users can install the same five core skills by copying their folders into the user skill directory. From a fresh checkout in PowerShell:
+
+```powershell
+git clone https://github.com/3xachris/3xa-harness.git
+Set-Location .\3xa-harness
+```
+
+If you already have the repo, start at its root and continue with the install and verification commands below:
 
 ```powershell
 $dest = Join-Path $HOME '.agents\skills'
@@ -103,6 +110,19 @@ Get-ChildItem $dest\workorder,$dest\sensory-gate,$dest\decision-log,$dest\handof
 ```
 
 The final command should list five `SKILL.md` files. Start a new Codex session and describe a matching task to confirm the skill is discovered and invoked.
+
+On macOS or Linux, the same user-skill install is:
+
+```sh
+git clone https://github.com/3xachris/3xa-harness.git
+cd 3xa-harness
+dest="$HOME/.agents/skills"
+mkdir -p "$dest"
+cp -R skills/core/workorder skills/core/sensory-gate skills/core/decision-log skills/core/handoff skills/core/honest-closeout "$dest/"
+find "$dest/workorder" "$dest/sensory-gate" "$dest/decision-log" "$dest/handoff" "$dest/honest-closeout" -name SKILL.md -print
+```
+
+The final command should print five `SKILL.md` paths. Start a new Codex session and describe a matching task to confirm the skill is discovered and invoked.
 
 The add-on skills copy the same way — each add-on skill folder is self-contained, scripts included, so copying the folder is the whole install:
 
